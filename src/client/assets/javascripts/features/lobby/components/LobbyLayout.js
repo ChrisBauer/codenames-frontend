@@ -10,15 +10,15 @@ import './Lobby.scss';
 export default class LobbyLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    users: PropTypes.array.isRequired,
-    games: PropTypes.array.isRequired
+    lobby: PropTypes.object.isRequired,
   };
 
   render() {
+    console.log(this.props);
     const { lobby: { users, games }, actions } = this.props;
 
     const newGameHandler = () => {
-      actions.createGame({id: 1, username: 'chris', displayName: 'Chris'});
+      actions.createGame({id: 1, username: 'chris'});
     };
 
     return (

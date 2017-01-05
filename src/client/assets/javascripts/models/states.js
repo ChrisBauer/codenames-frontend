@@ -6,7 +6,7 @@ import {User, Player} from './user';
 import {GameInfo, Game} from './game';
 
 export type LoginState = {
-  user: User
+  user: ?User
 };
 
 export type LobbyState = {
