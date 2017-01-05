@@ -1,0 +1,14 @@
+
+
+.lobby {
+  display: flex;
+}
+
+.users, .games {
+  flex: 1 0 auto;
+  padding: 20px;
+
+  h1 {
+    text-align: center;
+  }
+}
