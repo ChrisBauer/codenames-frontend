@@ -3,7 +3,6 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 
 import './Login.scss';
 
@@ -26,7 +25,13 @@ export default class LoginLayout extends Component {
     };
 
     const logoutHandler = () => {
+      actions.removeUsers([user]);
       actions.logout()
+    };
+
+    const goToLobby = () => {
+      actions.addUsers([user]);
+      this.props.history.push('/lobby');
     };
 
     const generateTemplate = () => {
@@ -34,7 +39,7 @@ export default class LoginLayout extends Component {
         return (
           <div>
             <h1>Hello {user.username}</h1>
-            <Link to="/lobby">Go to Lobby</Link>
+            <a onClick={goToLobby}>Go to Lobby</a>
             <hr />
             <a onClick={logoutHandler}>Logout</a>
           </div>

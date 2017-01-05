@@ -2,6 +2,7 @@
 
 import { createStructuredSelector } from 'reselect';
 import without from 'lodash/without';
+import union from 'lodash/union';
 
 import { LobbyState } from 'models/states';
 import { User, createPlayerFromUser } from 'models/user';
@@ -55,10 +56,10 @@ function createNewGame (user: User, name: ?string): GameInfo {
 export default function reducer(state: LobbyState = initialState, action: any = {}): LobbyState {
   switch (action.type) {
     case ADD_USERS: {
-      // TODO: flesh out the method bodies
+      console.log('in lobby - add user');
       return {
         ...state,
-        users: state.users.concat(action.users)
+        users: union(state.users, action.users)
       };
     }
 
@@ -66,21 +67,21 @@ export default function reducer(state: LobbyState = initialState, action: any = 
       return {
         ...state,
         // TODO: Ensure without works with array params
-        users: without(state.users, action.users)
+        users: without(state.users, ...action.users)
       };
 
     case ADD_GAMES: {
       // TODO: flesh out the method bodies
       return {
         ...state,
-        games: state.games.concat(action.games)
+        games: union(state.games, action.games)
       };
     }
 
     case REMOVE_GAMES:
       return {
         ...state,
-        games: without(state.games, action.games)
+        games: without(state.games, ...action.games)
       };
 
     case CREATE_GAME:
@@ -99,10 +100,14 @@ export default function reducer(state: LobbyState = initialState, action: any = 
 
 // Action Creators
 
-const addUsers = (users: [User]) => ({
-  type: ADD_USERS,
-  users
-});
+const addUsers = (users: [User]) => {
+  console.log('in addUser action creator');
+  console.log(users);
+  return {
+    type: ADD_USERS,
+    users
+  };
+};
 
 const removeUsers = (users: [User]) => ({
   type: REMOVE_USERS,

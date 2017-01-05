@@ -3,7 +3,6 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 
 import './Lobby.scss';
 
@@ -21,14 +20,19 @@ export default class LobbyLayout extends Component {
       actions.createGame({id: 1, username: 'chris'});
     };
 
+    const leaveLobby = () => {
+      // TODO: figure out how to get the current user and log him out
+      this.props.history.push('/login');
+    };
+
     return (
       <div className="lobby">
-        <Link to="/">Back to Home</Link>
+        <a onClick={leaveLobby}>Back to Login</a>
         <div className="users">
           <h1>Users</h1>
           <hr />
           {users.map(user => (
-            <div className="user">{user.displayName}</div>
+            <div key={user.id} className="user">{user.username}</div>
           ))}
         </div>
         <div className="games">

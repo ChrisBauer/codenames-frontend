@@ -7,6 +7,7 @@ import { createStructuredSelector } from 'reselect';
 
 import { LoginState } from 'models/states';
 import { User } from 'models/user';
+import { actionCreators as lobbyActions } from '../lobby';
 
 // Action Types
 
@@ -49,9 +50,9 @@ function createNewUser(username: string): User {
 export default function reducer(state: LoginState = initialState, action: any = {}): LoginState {
   switch (action.type) {
     case LOGIN: {
-      // TODO: flesh out the method bodies
+      const user = createNewUser(action.username);
       return {
-        user: createNewUser(action.username)
+        user: user
       };
     }
 

@@ -7,10 +7,11 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import { actionCreators as loginActions, selector } from '../';
+import { actionCreators as lobbyActions } from '../../lobby';
 import LoginLayout from './LoginLayout';
 
 @connect(selector, (dispatch) => ({
-  actions: bindActionCreators(loginActions, dispatch)
+  actions: bindActionCreators({...loginActions, ...lobbyActions}, dispatch)
 }))
 export default class LoginView extends Component {
   render() {
