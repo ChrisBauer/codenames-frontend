@@ -18,7 +18,7 @@ export default class LobbyLayout extends Component {
     const { lobby: { users, games }, login: {user}, actions } = this.props;
 
     if (!user) {
-      this.props.history.push('/login');
+      this.props.history.push('/');
     }
 
     const newGameHandler = () => {
@@ -31,7 +31,7 @@ export default class LobbyLayout extends Component {
       // TODO: figure out how to get the current user and log him out
       actions.removeUsers([user]);
       actions.logout(user);
-      this.props.history.push('/login');
+      this.props.history.push('/');
     };
 
     const goToGame = (gameId) => {

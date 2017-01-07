@@ -37,6 +37,9 @@ export default class StagingLayout extends Component {
   render() {
     console.log(this.props);
     const { staging: { players, gameInfo, readyPlayers}, login: { user }, actions } = this.props;
+    if (!user) {
+      this.props.history.push('/');
+    }
 
     console.log(user);
 
@@ -53,7 +56,7 @@ export default class StagingLayout extends Component {
     const logout = () => {
       console.log(user);
       actions.logout(user);
-      this.props.history.push('/login');
+      this.props.history.push('/');
     };
 
     const leaveStaging = () => {
