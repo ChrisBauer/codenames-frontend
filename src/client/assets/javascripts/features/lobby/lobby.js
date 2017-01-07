@@ -35,7 +35,8 @@ function createNewGame (user: User, name: ?string): GameInfo {
   return {
     name: name ? name : 'Game ' + gameId,
     id: gameId++,
-    players: [createPlayerFromUser(user)]
+    players: [createPlayerFromUser(user)],
+    status: 'PENDING'
   };
 }
 

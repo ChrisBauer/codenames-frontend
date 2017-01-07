@@ -6,10 +6,14 @@ import {Player} from './user';
 import {Card} from './card';
 import {Team} from './user';
 
+export type GameStatus =
+ | "PENDING" | "IN PROGRESS" | "COMPLETED"
+
 export type GameInfo = {
   id: number,
   name: string,
-  players: [Player]
+  players: [Player],
+  status: GameStatus
 };
 
 export type Board = {

@@ -1,0 +1,38 @@
+
+
+.staging {
+  display: flex;
+}
+
+.red, .blue {
+  flex: 1 0 auto;
+  padding: 20px;
+
+  h1 {
+    text-align: center;
+  }
+
+  .player {
+    display: flex;
+
+    .is-ready:after {
+      content: '✓';
+      color: darkgreen;
+    }
+  }
+}
+
+.red {
+  h2 {
+    color: darkred;
+  }
+}
+.blue {
+  h2 {
+    color: #014c8c;
+  }
+}
+
+a {
+  cursor: pointer;
+}

@@ -34,6 +34,11 @@ export default class LobbyLayout extends Component {
       this.props.history.push('/login');
     };
 
+    const goToGame = (gameId) => {
+      console.log(gameId);
+      this.props.history.push('/staging/' + gameId);
+    };
+
     return (
       <div className="lobby">
         <a onClick={leaveLobby}>Back to Login</a>
@@ -49,7 +54,7 @@ export default class LobbyLayout extends Component {
           <hr />
           <button onClick={newGameHandler}>Create Game</button>
           {games.map(game => (
-            <div key={game.id} className="game">{game.name}</div>
+            <div key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</div>
           ))}
         </div>
       </div>

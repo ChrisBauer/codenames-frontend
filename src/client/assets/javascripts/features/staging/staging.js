@@ -8,13 +8,14 @@ import without from 'lodash/without';
 import union from 'lodash/union';
 
 import { StagingState } from 'models/states';
-import { Player, Team } from 'models/user';
+import { User, Player, Team } from 'models/user';
 import { GameInfo } from 'models/game';
 import { Card, Board, wordList} from 'models/card';
 
 // Action Types
 
 const POPULATE_STAGING = 'codenames/staging/POPULATE_STAGING';
+const ADD_THIS_PLAYER = 'codenames/staging/ADD_THIS_PLAYER';
 const ADD_PLAYERS = 'codenames/staging/ADD_PLAYERS';
 const REMOVE_PLAYERS = 'codenames/staging/REMOVE_PLAYERS';
 const CHANGE_TEAM = 'codenames/staging/CHANGE_TEAM';
@@ -58,6 +59,14 @@ function checkTeamsAndRoles (state: StagingState): boolean {
   return true;
 }
 
+function createNewPlayerFromUser(user: User) : Player {
+  return {
+    user: user,
+    team: 'RED',
+    role: 'GUESSER'
+  };
+}
+
 function createBoard(firstTeam: ?Team): Board{
   // pick 25 random words
   // if team passed, that one gets the extra
@@ -79,7 +88,8 @@ function createBoard(firstTeam: ?Team): Board{
  * }
  */
 
-export default function reducer(state: GameState = initialState, action: any = {}): GameState {
+export default function reducer(state: StagingState = initialState, action: any = {}): GameState {
+  let playerIndex;
   switch (action.type) {
     case POPULATE_STAGING: {
       return {
@@ -88,6 +98,17 @@ export default function reducer(state: GameState = initialState, action: any = {
         readyPlayers: []
       };
     }
+
+    case ADD_THIS_PLAYER:
+      // If this player already exists, return the state
+      if (state.players.find(player => player.user.id == action.user.id)) {
+        return state;
+      }
+      // Otherwise create a new player
+      return {
+        ...state,
+        players: [...state.players, createNewPlayerFromUser(action.user)]
+      };
 
     case ADD_PLAYERS:
       return {
@@ -98,12 +119,12 @@ export default function reducer(state: GameState = initialState, action: any = {
     case REMOVE_PLAYERS:
       return {
         ...state,
-        players: without(state.players, action.players)
+        players: without(state.players, ...action.players)
       };
 
     case CHANGE_TEAM:
-      const index = state.players.indexOf(action.player);
-      if (index == -1) {
+      playerIndex = state.players.findIndex(player => player.user.id == action.player.user.id);
+      if (playerIndex == -1) {
         return state;
       }
 
@@ -111,20 +132,25 @@ export default function reducer(state: GameState = initialState, action: any = {
         ...state,
         readyPlayers: [], // Reset the "ready" players
         players: [
-          ...state.players.slice(0, index),
+          ...state.players.slice(0, playerIndex),
           {...action.player, team: action.team}, // Here's where we change the team
-          ...state.players.slice(index + 1)
+          ...state.players.slice(playerIndex + 1)
         ]
       };
 
     case CHANGE_ROLE:
+      playerIndex = state.players.findIndex(player => player.user.id == action.player.user.id);
+      if (playerIndex == -1) {
+        return state;
+      }
+
       return {
         ...state,
         readyPlayers: [], // Reset the "ready" players
         players: [
-          ...state.players.slice(0, index),
+          ...state.players.slice(0, playerIndex),
           {...action.player, role: action.role}, // Here's where we change the role
-          ...state.players.slice(index + 1)
+          ...state.players.slice(playerIndex + 1)
         ]
       };
 
@@ -139,6 +165,7 @@ export default function reducer(state: GameState = initialState, action: any = {
       };
 
       if (newState.players.length == newState.readyPlayers.length) {
+        // Change this game's status
         console.log('OGOGOGOGOGOG');
       }
       return newState;
@@ -154,6 +181,11 @@ const populateStaging = (gameInfo: GameInfo, players: [Player]) => ({
   type: POPULATE_STAGING,
   gameInfo,
   players
+});
+
+const addThisPlayer = (user: User) => ({
+  type: ADD_THIS_PLAYER,
+  user
 });
 
 const addPlayers = (players: [Player]) => ({
@@ -190,6 +222,7 @@ export const selector = createStructuredSelector({
 
 export const actionCreators = {
   populateStaging,
+  addThisPlayer,
   addPlayers,
   removePlayers,
   changeTeam,
