@@ -7,7 +7,6 @@ import { createStructuredSelector } from 'reselect';
 
 import { LoginState } from 'models/states';
 import { User } from 'models/user';
-import { actionCreators as lobbyActions } from '../lobby';
 
 // Action Types
 

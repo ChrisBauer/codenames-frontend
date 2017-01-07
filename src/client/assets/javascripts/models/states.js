@@ -16,7 +16,8 @@ export type LobbyState = {
 
 export type StagingState = {
   players: [Player],
-  gameInfo: GameInfo
+  gameInfo: GameInfo,
+  readyPlayers: [Player]
 }
 
 export type GameState = {

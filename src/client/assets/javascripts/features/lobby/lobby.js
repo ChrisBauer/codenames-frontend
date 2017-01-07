@@ -130,10 +130,9 @@ const createGame = (user: User, name: string) => ({
   name
 });
 
-const lobby = (state) => state[NAME];
-
 export const selector = createStructuredSelector({
-  lobby
+  lobby: state => state['lobby'],
+  login: state => state['login']
 });
 
 export const actionCreators = {

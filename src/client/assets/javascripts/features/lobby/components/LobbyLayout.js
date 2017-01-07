@@ -10,17 +10,19 @@ export default class LobbyLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     lobby: PropTypes.object.isRequired,
+    login: PropTypes.object.isRequired
   };
 
   render() {
     console.log(this.props);
-    const { lobby: { users, games }, actions } = this.props;
+    const { lobby: { users, games }, login: {user}, actions } = this.props;
 
     const newGameHandler = () => {
       actions.createGame({id: 1, username: 'chris'});
     };
 
     const leaveLobby = () => {
+      console.log(user);
       // TODO: figure out how to get the current user and log him out
       this.props.history.push('/login');
     };
