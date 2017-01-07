@@ -17,13 +17,20 @@ export default class LobbyLayout extends Component {
     console.log(this.props);
     const { lobby: { users, games }, login: {user}, actions } = this.props;
 
+    if (!user) {
+      this.props.history.push('/login');
+    }
+
     const newGameHandler = () => {
       actions.createGame({id: 1, username: 'chris'});
     };
 
     const leaveLobby = () => {
       console.log(user);
+      console.log(this.props);
       // TODO: figure out how to get the current user and log him out
+      actions.removeUsers([user]);
+      actions.logout(user);
       this.props.history.push('/login');
     };
 
