@@ -15,7 +15,6 @@ const ADD_USERS = 'codenames/lobby/ADD_USERS';
 const REMOVE_USERS = 'codenames/lobby/REMOVE_USERS';
 const ADD_GAMES = 'codenames/lobby/ADD_GAMES';
 const REMOVE_GAMES = 'codenames/lobby/REMOVE_GAMES';
-const CREATE_GAME = 'codenames/lobby/CREATE_GAME';
 // add logout to login section
 
 // This will be used in our root reducer and selectors
@@ -31,7 +30,7 @@ const initialState: LobbyState = {
 
 let gameId = 0;
 
-function createNewGame (user: User, name: ?string): GameInfo {
+export function createNewGame (user: User, name: ?string): GameInfo {
   return {
     name: name ? name : 'Game ' + gameId,
     id: gameId++,
@@ -85,15 +84,6 @@ export default function reducer(state: LobbyState = initialState, action: any = 
         games: without(state.games, ...action.games)
       };
 
-    case CREATE_GAME:
-      return {
-        ...state,
-        games: [
-          ...state.games,
-          createNewGame(action.user, action.name)
-        ]
-      };
-
     default:
       return state;
   }
@@ -101,7 +91,7 @@ export default function reducer(state: LobbyState = initialState, action: any = 
 
 // Action Creators
 
-const addUsers = (users: [User]) => {
+const addUsersLobby = (users: [User]) => {
   console.log('in addUser action creator');
   console.log(users);
   return {
@@ -110,7 +100,7 @@ const addUsers = (users: [User]) => {
   };
 };
 
-const removeUsers = (users: [User]) => ({
+const removeUsersLobby = (users: [User]) => ({
   type: REMOVE_USERS,
   users
 });
@@ -125,21 +115,14 @@ const removeGames = (games: [Game]) => ({
   games
 });
 
-const createGame = (user: User, name: string) => ({
-  type: CREATE_GAME,
-  user,
-  name
-});
-
 export const selector = createStructuredSelector({
   lobby: state => state['lobby'],
   login: state => state['login']
 });
 
 export const actionCreators = {
-  addUsers,
-  removeUsers,
+  addUsersLobby,
+  removeUsersLobby,
   addGames,
-  removeGames,
-  createGame
+  removeGames
 };

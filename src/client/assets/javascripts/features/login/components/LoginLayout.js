@@ -25,12 +25,12 @@ export default class LoginLayout extends Component {
     };
 
     const logoutHandler = () => {
-      actions.removeUsers([user]);
-      actions.logout()
+      actions.removeUsersLobby([user]);
+      actions.logout();
     };
 
     const goToLobby = () => {
-      actions.addUsers([user]);
+      actions.addUsersLobby([user]);
       this.props.history.push('/lobby');
     };
 

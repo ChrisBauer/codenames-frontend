@@ -29,7 +29,6 @@ export const NAME = 'staging';
 // Define the initial state for `staging` module
 
 const initialState: StagingState = {
-  players: [],
   gameInfo: {},
   readyPlayers: []
 };
@@ -37,17 +36,17 @@ const initialState: StagingState = {
 // TODO: The server should validate this too
 function checkTeamsAndRoles (state: StagingState): boolean {
   // Need at least 4 players
-  if (state.players.length < 3) {
+  if (state.gameInfo.players.length < 3) {
     return false;
   }
-  const redTeam = players.filter(player => player.team == 'RED');
+  const redTeam = state.gameInfo.players.filter(player => player.team == 'RED');
   if (redTeam.length < 2) {
     return false;
   }
   if (redTeam.filter(red => red.role == 'GIVER').length != 1) {
     return false;
   }
-  const blueTeam = players.filter(player => player.team == 'BLUE');
+  const blueTeam = state.gameInfo.players.filter(player => player.team == 'BLUE');
   if (blueTeam.length < 2) {
     return false;
   }
@@ -66,6 +65,9 @@ function createNewPlayerFromUser(user: User) : Player {
     role: 'GUESSER'
   };
 }
+
+const findPlayerIndex = (state: StagingState, player: Player): number =>
+  state.gameInfo.players.findIndex(player => player.user.id == player.user.id);
 
 function createBoard(firstTeam: ?Team): Board{
   // pick 25 random words
@@ -93,37 +95,46 @@ export default function reducer(state: StagingState = initialState, action: any 
   switch (action.type) {
     case POPULATE_STAGING: {
       return {
-        players: action.players,
-        gameInfo: {},
+        ...state,
+        gameInfo: action.gameInfo,
         readyPlayers: []
       };
     }
 
     case ADD_THIS_PLAYER:
       // If this player already exists, return the state
-      if (state.players.find(player => player.user.id == action.user.id)) {
+      if (state.gameInfo.players.find(player => player.user.id == action.user.id)) {
         return state;
       }
       // Otherwise create a new player
       return {
         ...state,
-        players: [...state.players, createNewPlayerFromUser(action.user)]
+        gameInfo: {
+          ...state.gameInfo,
+          players: [...state.gameInfo.players, createNewPlayerFromUser(action.user)]
+        }
       };
 
     case ADD_PLAYERS:
       return {
         ...state,
-        players: union(state.players, action.players)
+        gameInfo: {
+          ...state.gameInfo,
+          players: union(state.players, action.players)
+        }
       };
 
     case REMOVE_PLAYERS:
       return {
         ...state,
-        players: without(state.players, ...action.players)
+        gameInfo: {
+          ...state.gameInfo,
+          players: without(state.players, ...action.players)
+        }
       };
 
     case CHANGE_TEAM:
-      playerIndex = state.players.findIndex(player => player.user.id == action.player.user.id);
+      playerIndex = findPlayerIndex(state, action.player);
       if (playerIndex == -1) {
         return state;
       }
@@ -131,15 +142,18 @@ export default function reducer(state: StagingState = initialState, action: any 
       return {
         ...state,
         readyPlayers: [], // Reset the "ready" players
-        players: [
-          ...state.players.slice(0, playerIndex),
-          {...action.player, team: action.team}, // Here's where we change the team
-          ...state.players.slice(playerIndex + 1)
-        ]
+        gameInfo: {
+          ...state.gameInfo,
+          players: [
+            ...state.gameInfo.players.slice(0, playerIndex),
+            {...action.player, team: action.team}, // Here's where we change the team
+            ...state.gameInfo.players.slice(playerIndex + 1)
+          ]
+        }
       };
 
     case CHANGE_ROLE:
-      playerIndex = state.players.findIndex(player => player.user.id == action.player.user.id);
+      playerIndex = findPlayerIndex(state, action.player)
       if (playerIndex == -1) {
         return state;
       }
@@ -147,11 +161,14 @@ export default function reducer(state: StagingState = initialState, action: any 
       return {
         ...state,
         readyPlayers: [], // Reset the "ready" players
-        players: [
-          ...state.players.slice(0, playerIndex),
-          {...action.player, role: action.role}, // Here's where we change the role
-          ...state.players.slice(playerIndex + 1)
-        ]
+        gameInfo: {
+          ...state.gameInfo,
+          players: [
+            ...state.gameInfo.players.slice(0, playerIndex),
+            {...action.player, role: action.role}, // Here's where we change the team
+            ...state.gameInfo.players.slice(playerIndex + 1)
+          ]
+        }
       };
 
     case READY:
@@ -164,7 +181,7 @@ export default function reducer(state: StagingState = initialState, action: any 
         readyPlayers: union(state.readyPlayers, [action.player])
       };
 
-      if (newState.players.length == newState.readyPlayers.length) {
+      if (newState.gameInfo.players.length == newState.readyPlayers.length) {
         // Change this game's status
         console.log('OGOGOGOGOGOG');
       }
@@ -177,10 +194,9 @@ export default function reducer(state: StagingState = initialState, action: any 
 
 // Action Creators
 
-const populateStaging = (gameInfo: GameInfo, players: [Player]) => ({
+const populateStaging = (gameInfo: GameInfo) => ({
   type: POPULATE_STAGING,
   gameInfo,
-  players
 });
 
 const addThisPlayer = (user: User) => ({
@@ -188,12 +204,12 @@ const addThisPlayer = (user: User) => ({
   user
 });
 
-const addPlayers = (players: [Player]) => ({
+const addPlayersStaging = (players: [Player]) => ({
   type: ADD_PLAYERS,
   players
 });
 
-const removePlayers = (players: [Player]) => ({
+const removePlayersStaging = (players: [Player]) => ({
   type: REMOVE_PLAYERS,
   players
 });
@@ -217,14 +233,15 @@ const ready = (player: Player) => ({
 
 export const selector = createStructuredSelector({
   staging: state => state[NAME],
-  login: state => state['login']
+  login: state => state['login'],
+  lobby: state => state['lobby']
 });
 
 export const actionCreators = {
   populateStaging,
   addThisPlayer,
-  addPlayers,
-  removePlayers,
+  addPlayersStaging,
+  removePlayersStaging,
   changeTeam,
   changeRole,
   ready

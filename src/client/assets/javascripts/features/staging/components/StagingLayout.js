@@ -11,6 +11,7 @@ import './Staging.scss';
 export default class StagingLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    lobby: PropTypes.object.isRequired,
     login: PropTypes.object.isRequired,
     staging: PropTypes.object.isRequired
   };
@@ -29,26 +30,21 @@ export default class StagingLayout extends Component {
     });
     return playerObj;
   }
-
-  componentWillMount () {
-    console.log(this.props.params);
-  }
-
   render() {
     console.log(this.props);
-    const { staging: { players, gameInfo, readyPlayers}, login: { user }, actions } = this.props;
+    const { staging: { gameInfo, readyPlayers}, login: { user }, actions } = this.props;
     if (!user) {
       this.props.history.push('/');
     }
 
     console.log(user);
 
-    const thisPlayer = this.getPlayerFromUser(players, user);
+    const thisPlayer = this.getPlayerFromUser(gameInfo.players, user);
     if (!thisPlayer) {
       actions.addThisPlayer(user);
     }
 
-    const playerObj = this.getPlayerObject(players, readyPlayers);
+    const playerObj = this.getPlayerObject(gameInfo.players, readyPlayers);
 
     console.log(thisPlayer);
     console.log(playerObj);
@@ -60,7 +56,7 @@ export default class StagingLayout extends Component {
     };
 
     const leaveStaging = () => {
-      actions.removePlayers([thisPlayer]);
+      actions.removePlayersStaging([thisPlayer]);
       this.props.history.push('/lobby');
     };
 

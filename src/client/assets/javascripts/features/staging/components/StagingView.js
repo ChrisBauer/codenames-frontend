@@ -8,10 +8,11 @@ import { bindActionCreators } from 'redux';
 
 import { actionCreators as stagingActions, selector } from '../';
 import { actionCreators as loginActions } from '../../login';
+import { actionCreators as lobbyActions } from '../../lobby';
 import StagingLayout from './StagingLayout';
 
 @connect(selector, (dispatch) => ({
-  actions: bindActionCreators({...loginActions, ...stagingActions}, dispatch)
+  actions: bindActionCreators({...loginActions, ...stagingActions, ...lobbyActions}, dispatch)
 }))
 export default class StagingView extends Component {
   render() {

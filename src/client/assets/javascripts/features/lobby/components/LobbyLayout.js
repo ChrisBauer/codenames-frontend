@@ -3,6 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
+import { createNewGame } from '../lobby';
 
 import './Lobby.scss';
 
@@ -21,21 +22,21 @@ export default class LobbyLayout extends Component {
       this.props.history.push('/');
     }
 
-    const newGameHandler = () => {
-      actions.createGame({id: 1, username: 'chris'});
+    const newGameHandler = (user: User, name: string) => {
+      const game = createNewGame(user, name);
+      actions.addGames([game]);
+      actions.populateStaging(game);
+      this.props.history.push('/staging/0');
     };
 
     const leaveLobby = () => {
-      console.log(user);
-      console.log(this.props);
-      // TODO: figure out how to get the current user and log him out
-      actions.removeUsers([user]);
+      actions.removeUsersLobby([user]);
       actions.logout(user);
       this.props.history.push('/');
     };
 
     const goToGame = (gameId) => {
-      console.log(gameId);
+      actions.populateStaging(games.find(game => game.id == gameId));
       this.props.history.push('/staging/' + gameId);
     };
 
@@ -52,7 +53,7 @@ export default class LobbyLayout extends Component {
         <div className="games">
           <h1>Games</h1>
           <hr />
-          <button onClick={newGameHandler}>Create Game</button>
+          <button onClick={() => newGameHandler(user, 'Testing')}>Create Game</button>
           {games.map(game => (
             <div key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</div>
           ))}
