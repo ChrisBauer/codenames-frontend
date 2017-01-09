@@ -117,7 +117,8 @@ const removeGames = (games: [Game]) => ({
 
 export const selector = createStructuredSelector({
   lobby: state => state['lobby'],
-  users: state => state['users']
+  users: state => state['users'],
+  games: state => state['games']
 });
 
 export const actionCreators = {

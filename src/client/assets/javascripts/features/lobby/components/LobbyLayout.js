@@ -14,35 +14,36 @@ export default class LobbyLayout extends Component {
     lobby: PropTypes.object.isRequired
   };
 
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  };
+
   render() {
     console.log(this.props);
-    const { users: { users, currentUserId }, actions } = this.props;
+    const { users: { users, currentUserId }, games: {games}, actions } = this.props;
 
     if (!validateUser(users, currentUserId)) {
-      this.props.history.push('/');
+      this.context.router.push('/');
     }
 
     const newGameHandler = (user: User, name: string) => {
       const game = createNewGame(user, name);
       actions.addGames([game]);
       actions.populateStaging(game);
-      this.props.history.push('/staging/0');
+      this.context.router.push('/staging/0');
     };
 
     const leaveLobby = () => {
-      actions.removeUsersLobby([user]);
-      actions.logout(user);
-      this.props.history.push('/');
+      actions.logoutCurrentUser();
+      this.context.router.push('/');
     };
 
     const goToGame = (gameId) => {
       actions.populateStaging(games.find(game => game.id == gameId));
-      this.props.history.push('/staging/' + gameId);
+      this.context.router.push('/staging/' + gameId);
     };
 
-    /*{games.map(game => (
-     <div key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</div>
-     ))}
+    /*
      </div>*/
 
     return (
@@ -59,6 +60,9 @@ export default class LobbyLayout extends Component {
           <h1>Games</h1>
           <hr />
           <button onClick={() => newGameHandler(user, 'Testing')}>Create Game</button>
+          {Object.keys(games).map(id => (
+            <div key={id} className="game" onClick={() => goToGame(id)}>{games[id].name}</div>
+          ))}
         </div>
       </div>
     );

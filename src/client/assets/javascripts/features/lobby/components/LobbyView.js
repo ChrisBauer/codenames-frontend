@@ -8,10 +8,12 @@ import { bindActionCreators } from 'redux';
 
 import { actionCreators as lobbyActions, selector } from '../';
 import { actionCreators as stagingActions } from '../../staging';
+import { userActions } from 'actions/userActions';
+import { gameActions } from 'actions/gameActions';
 import LobbyLayout from './LobbyLayout';
 
 @connect(selector, (dispatch) => ({
-  actions: bindActionCreators({...lobbyActions, ...stagingActions}, dispatch)
+  actions: bindActionCreators({...userActions, ...gameActions, ...lobbyActions, ...stagingActions}, dispatch)
 }))
 export default class LobbyView extends Component {
   render() {

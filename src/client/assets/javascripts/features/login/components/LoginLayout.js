@@ -12,6 +12,10 @@ export default class LoginLayout extends Component {
     user: PropTypes.object
   };
 
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  };
+
   render() {
     console.log(this.props);
     console.log('in render function');
@@ -20,8 +24,8 @@ export default class LoginLayout extends Component {
 
     const loginHandler = () => {
       if (this.loginInput.value) {
-        actions.createUserAction(this.loginInput.value);
-        this.props.history.push('/lobby');
+        actions.createUser(this.loginInput.value);
+        this.context.router.push('/lobby');
       }
     };
 

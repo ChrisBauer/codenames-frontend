@@ -3,11 +3,13 @@
  */
 
 const CREATE_USER = 'codenames/actions/user/createUser';
-const ADD_USERS = 'codenames/actions/user/addUser';
+const ADD_USERS = 'codenames/actions/user/addUsers';
+const REMOVE_USERS = 'codenames/actions/user/removeUsers';
+const LOGOUT_CURRENT_USER = 'codenames/actions/user/logoutCurrentUser';
 
 let nextUserId = 0;
 
-const createUser = (username) => {
+const createNewUser = (username) => {
   return {
     id: nextUserId++,
     username: username
@@ -19,10 +21,18 @@ const initialState = {
   users: {}
 };
 
+const getUsersWithout = (users, withoutIds) => {
+  const returnUsers = Object.assign({}, users);
+  if (withoutIds) {
+    withoutIds.forEach(id => delete returnUsers[id]);
+  }
+  return returnUsers;
+};
+
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case CREATE_USER:
-      const user = createUser(action.username);
+      const user = createNewUser(action.username);
       return {
         currentUserId: user.id,
         users: {
@@ -37,12 +47,45 @@ export const reducer = (state = initialState, action) => {
         return users;
       }, state);
 
+    case REMOVE_USERS:
+      return {
+        ...state,
+        users: getUsersWithout(state.users, action.userIds)
+      };
+
+    case LOGOUT_CURRENT_USER:
+      return {
+        currentUserId: null,
+        users: getUsersWithout(state.users, [state.currentUserId])
+      };
+
     default:
       return state;
   }
 };
 
-export const createUserAction = (username) => ({
+export const createUser = (username) => ({
   type: CREATE_USER,
   username
 });
+
+export const addUsers = (users) => ({
+  type: ADD_USERS,
+  users
+});
+
+export const removeUsers = (userIds) => ({
+  type: REMOVE_USERS,
+  userIds
+});
+
+export const logoutCurrentUser = () => ({
+  type: LOGOUT_CURRENT_USER
+});
+
+export const userActions = {
+  createUser,
+  addUsers,
+  removeUsers,
+  logoutCurrentUser
+};
