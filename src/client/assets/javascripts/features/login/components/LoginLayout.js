@@ -15,30 +15,29 @@ export default class LoginLayout extends Component {
   render() {
     console.log(this.props);
     console.log('in render function');
-    const { login: { user }, actions } = this.props;
+    const { currentUserId, users, actions } = this.props;
 
 
     const loginHandler = () => {
       if (this.loginInput.value) {
-        actions.login(this.loginInput.value);
+        actions.createUserAction(this.loginInput.value);
+        this.props.history.push('/lobby');
       }
     };
 
     const logoutHandler = () => {
-      actions.removeUsersLobby([user]);
       actions.logout();
     };
 
     const goToLobby = () => {
-      actions.addUsersLobby([user]);
       this.props.history.push('/lobby');
     };
 
     const generateTemplate = () => {
-      if (user) {
+      if (currentUserId) {
         return (
           <div>
-            <h1>Hello {user.username}</h1>
+            <h1>Hello {users[currentUserId].username}</h1>
             <a onClick={goToLobby}>Go to Lobby</a>
             <hr />
             <a onClick={logoutHandler}>Logout</a>

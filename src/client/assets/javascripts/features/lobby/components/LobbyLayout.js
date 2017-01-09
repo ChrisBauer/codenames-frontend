@@ -4,21 +4,21 @@
 
 import React, { Component, PropTypes } from 'react';
 import { createNewGame } from '../lobby';
+import { validateUser } from '../../../validators';
 
 import './Lobby.scss';
 
 export default class LobbyLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    lobby: PropTypes.object.isRequired,
-    login: PropTypes.object.isRequired
+    lobby: PropTypes.object.isRequired
   };
 
   render() {
     console.log(this.props);
-    const { lobby: { users, games }, login: {user}, actions } = this.props;
+    const { users: { users, currentUserId }, actions } = this.props;
 
-    if (!user) {
+    if (!validateUser(users, currentUserId)) {
       this.props.history.push('/');
     }
 
@@ -40,23 +40,25 @@ export default class LobbyLayout extends Component {
       this.props.history.push('/staging/' + gameId);
     };
 
+    /*{games.map(game => (
+     <div key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</div>
+     ))}
+     </div>*/
+
     return (
       <div className="lobby">
         <a onClick={leaveLobby}>Back to Login</a>
         <div className="users">
           <h1>Users</h1>
           <hr />
-          {users.map(user => (
-            <div key={user.id} className="user">{user.username}</div>
+          {Object.keys(users).map(id => (
+            <div key={id} className="user">{users[id].username}</div>
           ))}
         </div>
         <div className="games">
           <h1>Games</h1>
           <hr />
           <button onClick={() => newGameHandler(user, 'Testing')}>Create Game</button>
-          {games.map(game => (
-            <div key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</div>
-          ))}
         </div>
       </div>
     );

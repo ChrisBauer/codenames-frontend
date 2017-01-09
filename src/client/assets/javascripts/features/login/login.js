@@ -19,9 +19,7 @@ export const NAME = 'login';
 
 // Define the initial state for `login` module
 
-const initialState: LoginState = {
-  user: null,
-};
+const initialState = null;
 
 let userId = 0;
 
@@ -46,19 +44,15 @@ function createNewUser(username: string): User {
  * }
  */
 
-export default function reducer(state: LoginState = initialState, action: any = {}): LoginState {
+export default function reducer(state = initialState, action: any = {}): LoginState {
   switch (action.type) {
     case LOGIN: {
       const user = createNewUser(action.username);
-      return {
-        user: user
-      };
+      return user.id;
     }
 
     case LOGOUT:
-      return {
-        user: null
-      };
+      return null;
 
     default:
       return state;
@@ -76,10 +70,9 @@ const logoutAction = () => ({
   type: LOGOUT
 });
 
-const login = (state) => state[NAME];
-
 export const selector = createStructuredSelector({
-  login
+  currentUserId: (state) => state['currentUserId'],
+  login: (state) => state['login']
 });
 
 export const actionCreators = {
