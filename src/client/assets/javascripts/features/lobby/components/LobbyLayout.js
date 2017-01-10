@@ -10,7 +10,8 @@ import './Lobby.scss';
 export default class LobbyLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    lobby: PropTypes.object.isRequired
+    users: PropTypes.object.isRequired,
+    games: PropTypes.object.isRequired
   };
 
   static contextTypes = {

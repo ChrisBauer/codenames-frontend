@@ -2,8 +2,5 @@
 // This is the exposed surface where modules can interface with each other.
 
 export {
-  default,
-  actionCreators,
   selector,
-  NAME
 } from './login';

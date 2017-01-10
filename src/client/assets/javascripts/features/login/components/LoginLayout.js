@@ -9,7 +9,7 @@ import './Login.scss';
 export default class LoginLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    user: PropTypes.object
+    currentUserId: PropTypes.number
   };
 
   static contextTypes = {
@@ -19,8 +19,11 @@ export default class LoginLayout extends Component {
   render() {
     console.log(this.props);
     console.log('in render function');
-    const { currentUserId, users, actions } = this.props;
+    const { currentUserId, actions } = this.props;
 
+    if (currentUserId) {
+      this.context.router.push('/lobby');
+    }
 
     const loginHandler = () => {
       if (this.loginInput.value) {
@@ -29,25 +32,7 @@ export default class LoginLayout extends Component {
       }
     };
 
-    const logoutHandler = () => {
-      actions.logout();
-    };
-
-    const goToLobby = () => {
-      this.props.history.push('/lobby');
-    };
-
     const generateTemplate = () => {
-      if (currentUserId) {
-        return (
-          <div>
-            <h1>Hello {users[currentUserId].username}</h1>
-            <a onClick={goToLobby}>Go to Lobby</a>
-            <hr />
-            <a onClick={logoutHandler}>Logout</a>
-          </div>
-        );
-      }
       return (
         <div>
           <input ref={input => {this.loginInput = input; }} placeholder="Username"></input>

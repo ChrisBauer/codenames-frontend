@@ -7,13 +7,14 @@ export const CHANGE_ROLE = 'codenames/actions/players/changeRole';
 export const SET_READY = 'codenames/actions/players/setReady';
 
 const resetReady = (players) => {
-  Object.keys(players).forEach(id => players[id].ready = false);
+  const resetPlayers = Object.assign({}, players);
+  Object.keys(resetPlayers).forEach(id => resetPlayers[id].ready = false);
+  return resetPlayers;
 };
 
 export const reducer = (state = {}, action) => {
   const originalState = Object.assign({}, state);
-  const stateCopy = Object.assign({}, state);
-  resetReady(stateCopy);
+  const stateCopy = resetReady(state);
   switch (action.type) {
     case CHANGE_TEAM:
       return {
