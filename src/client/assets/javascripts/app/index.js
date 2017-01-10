@@ -11,7 +11,8 @@ import configureStore from './store/configureStore';
 import 'styles/bootstrap.min.css';
 import 'styles/styles.scss';
 
-const store = configureStore();
+export const store = configureStore();
+window.__store = store;
 const history = syncHistoryWithStore(browserHistory, store);
 
 // Get the DOM Element that will host our React application
