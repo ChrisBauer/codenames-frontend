@@ -8,13 +8,23 @@ export const validateUser = (users, currentUserId) => {
 
 const getTeams = (players) => {
   return Object.keys(players).reduce((teams, id) => {
+    if (!players[id].ready) {
+      throw 'at least one player was not ready';
+    }
     teams[players[id].team][id] = players[id];
     return teams;
   }, {RED: {}, BLUE: {}});
 };
 
 export const gameCanStart = (players) => {
-  const teams = getTeams(players);
+  let teams;
+  try {
+    teams = getTeams(players);
+  }
+  catch (ex) {
+    // there must have been an error. Return false.
+    return false;
+  }
   // Need at least 4 players
   if (Object.keys(teams.RED).length + Object.keys(teams.BLUE).length < 4) {
     return false;

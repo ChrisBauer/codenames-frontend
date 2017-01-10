@@ -42,10 +42,16 @@ export const reducer = (state = initialState, action) => {
       };
 
     case ADD_USERS:
-      return action.users.reduce((users, user) => {
-        users[user.id] = user;
-        return users;
-      }, state);
+      return {
+        ...state,
+        users: {
+          ...state.users,
+          ...action.users.reduce((users, user) => {
+            users[user.id] = user;
+            return users;
+          }, {})
+        }
+      };
 
     case REMOVE_USERS:
       return {

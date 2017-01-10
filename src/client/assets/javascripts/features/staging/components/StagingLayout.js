@@ -31,7 +31,7 @@ export default class StagingLayout extends Component {
     return Object.keys(players).reduce((teams, userId) => {
       const nextPerson = this.getPerson(users, players, userId);
       const team = nextPerson.player.team;
-      teams[team].userId = nextPerson;
+      teams[team][userId] = nextPerson;
       return teams;
     }, {RED: {}, BLUE: {}});
   }

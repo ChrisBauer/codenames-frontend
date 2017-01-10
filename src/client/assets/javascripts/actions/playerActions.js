@@ -48,9 +48,10 @@ export const delegate = (state, action) => {
 
 export const reducer = (state = {}, action) => {
   const originalState = Object.assign({}, state);
-  const stateCopy = resetReady(state);
+  let stateCopy;
   switch (action.type) {
     case ADD_PLAYERS:
+      stateCopy = resetReady(state);
       const newUsers = action.userIds.reduce((players, id) => {
         players[id] = createPlayerFromUser(id);
         return players;
@@ -60,8 +61,10 @@ export const reducer = (state = {}, action) => {
         ...newUsers
       };
     case REMOVE_PLAYERS:
+      stateCopy = resetReady(state);
       return objectWithout(stateCopy, action.userIds);
     case CHANGE_TEAM:
+      stateCopy = resetReady(state);
       return {
         ...stateCopy,
         [action.userId]: {
@@ -70,6 +73,7 @@ export const reducer = (state = {}, action) => {
         }
       };
     case CHANGE_ROLE:
+      stateCopy = resetReady(state);
       return {
         ...stateCopy,
         [action.userId]: {
@@ -79,9 +83,9 @@ export const reducer = (state = {}, action) => {
       };
     case SET_READY:
       return {
-        ...stateCopy,
+        ...originalState,
         [action.userId]: {
-          ...stateCopy[action.userId],
+          ...originalState[action.userId],
           ready: true
         }
       };

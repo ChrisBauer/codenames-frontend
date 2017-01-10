@@ -10,7 +10,7 @@ const REMOVE_GAMES = 'codenames/actions/game/removeGames';
 const LEAVE_CURRENT_GAME = 'codenames/actions/game/leaveCurrentGame';
 const SELECT_GAME = 'codenames/actions/game/selectGame';
 
-import { CHANGE_TEAM, CHANGE_ROLE, SET_READY, delegate as delegateToPlayersReducer, createPlayerFromUser } from 'actions/playerActions';
+import { ADD_PLAYERS, REMOVE_PLAYERS, CHANGE_TEAM, CHANGE_ROLE, SET_READY, delegate as delegateToPlayersReducer, createPlayerFromUser } from 'actions/playerActions';
 import { PASS, GUESS, GIVE_CLUE, delegate as delegateToGameplayReducer } from 'actions/gameplayActions';
 
 let nextGameId = 0;
@@ -94,6 +94,8 @@ export const reducer = (state = initialState, action) => {
         currentGameId: action.gameId
       };
 
+    case ADD_PLAYERS:
+    case REMOVE_PLAYERS:
     case CHANGE_TEAM:
     case CHANGE_ROLE:
     case SET_READY:
