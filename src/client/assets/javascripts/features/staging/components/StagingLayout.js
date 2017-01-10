@@ -11,65 +11,68 @@ import './Staging.scss';
 export default class StagingLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    lobby: PropTypes.object.isRequired,
-    login: PropTypes.object.isRequired,
-    staging: PropTypes.object.isRequired
+    users: PropTypes.object.isRequired,
+    games: PropTypes.object.isRequired
   };
 
-  getPlayerFromUser (players: [Player], user: User): Player {
-    return players.find(player => player.user.id == user.id);
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  };
+
+  getPerson (users, players, userId) {
+    return {
+      user: users[userId],
+      player: players[userId],
+      id: userId
+    };
   }
 
-  getPlayerObject (players: [Player], readyPlayers: [Player]): Object {
-    const playerObj = {
-      red: players.filter(player => player.team == 'RED'),
-      blue: players.filter(player => player.team == 'BLUE')
-    };
-    readyPlayers.forEach(ready => {
-      playerObj[ready.team.toLowerCase()].find(ready).isReady = true;
-    });
-    return playerObj;
+  getTeams (users, players) {
+    return Object.keys(players).reduce((teams, userId) => {
+      const nextPerson = this.getPerson(users, players, userId);
+      const team = nextPerson.player.team;
+      teams[team].userId = nextPerson;
+      return teams;
+    }, {RED: {}, BLUE: {}});
   }
   render() {
     console.log(this.props);
-    const { staging: { gameInfo, readyPlayers}, login: { user }, actions } = this.props;
-    if (!user) {
-      this.props.history.push('/');
+    const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
+    if (currentUserId == null) {
+      this.context.router.push('/');
+    }
+    if (currentGameId == null) {
+      this.context.router.push('/lobby');
     }
 
-    console.log(user);
-
-    const thisPlayer = this.getPlayerFromUser(gameInfo.players, user);
-    if (!thisPlayer) {
-      actions.addThisPlayer(user);
+    const thisPerson = this.getPerson(users, games[currentGameId].players, currentUserId);
+    if (!thisPerson) {
+      this.context.router.push('/lobby');
     }
 
-    const playerObj = this.getPlayerObject(gameInfo.players, readyPlayers);
-
-    console.log(thisPlayer);
-    console.log(playerObj);
+    const game = games[currentGameId];
+    const teams = this.getTeams(users, game.players);
 
     const logout = () => {
-      console.log(user);
-      actions.logout(user);
-      this.props.history.push('/');
+      actions.logoutCurrentUser();
+      this.context.router.push('/');
     };
 
     const leaveStaging = () => {
-      actions.removePlayersStaging([thisPlayer]);
-      this.props.history.push('/lobby');
+      actions.leaveCurrentGame();
+      this.context.router.push('/lobby');
     };
 
     const changeTeam = () => {
-      actions.changeTeam(thisPlayer, thisPlayer.team == 'RED' ? 'BLUE' : 'RED');
+      actions.changeTeam(thisPerson.id);
     };
 
     const changeRole = () => {
-      actions.changeRole(thisPlayer, thisPlayer.role == 'GIVER' ? 'GUESSER' : 'GIVER');
+      actions.changeRole(thisPerson.id);
     };
 
     const setReady = () => {
-      actions.ready(thisPlayer);
+      actions.setReady(thisPerson.id);
     };
 
 
@@ -80,28 +83,50 @@ export default class StagingLayout extends Component {
         <div className="red">
           <h1>Red Team</h1>
           <hr />
-          {playerObj.red.map(player => (
-            <div key={player.user.id} className="player">
-              <div className={player.isReady ? 'is-ready': ''} />
-              <h2>{player.user.username}</h2>
-              <div><button className="change-team" onClick={changeTeam}>T</button></div>
-              <div><button className="change-role" onClick={changeRole}>R</button></div>
-              <div><button className="set-ready" onClick={setReady}>✓</button></div>
-            </div>
-          ))}
+          {Object.keys(teams.RED).map(userId => {
+            const person = teams.RED[userId];
+            if (person.id == thisPerson.id) {
+              return (
+                <div key={userId} className="player">
+                  <div className={person.player.ready ? 'is-ready': ''}/>
+                  <h2>{person.user.username}</h2>
+                  <button className="change-team" onClick={changeTeam}>T</button>
+                  <button className="change-role" onClick={changeRole}>R</button>
+                  <button className="set-ready" onClick={setReady}>✓</button>
+                </div>
+              )
+            }
+            return (
+              <div key={userId} className="player">
+                <div className={person.player.ready ? 'is-ready': ''}/>
+                <h2>{person.user.username}</h2>
+              </div>
+            )
+          })}
         </div>
         <div className="blue">
           <h1>Blue Team</h1>
           <hr />
-          {playerObj.blue.map(player => (
-            <div key={player.user.id} className="player">
-              <div className={player.isReady ? 'is-ready': ''} />
-              <h2>{player.user.username}</h2>
-              <div><button className="change-team" onClick={changeTeam}>T</button></div>
-              <div><button className="change-role" onClick={changeRole}>R</button></div>
-              <div><button className="set-ready" onClick={setReady}>✓</button></div>
-            </div>
-          ))}
+          {Object.keys(teams.BLUE).map(userId => {
+            const person = teams.BLUE[userId];
+            if (person.id == thisPerson.id) {
+              return (
+                <div key={userId} className="player">
+                  <div className={person.player.ready ? 'is-ready': ''}/>
+                  <h2>{person.user.username}</h2>
+                  <button className="change-team" onClick={changeTeam}>T</button>
+                  <button className="change-role" onClick={changeRole}>R</button>
+                  <button className="set-ready" onClick={setReady}>✓</button>
+                </div>
+              )
+            }
+            return (
+              <div key={userId} className="player">
+                <div className={person.player.ready ? 'is-ready': ''}/>
+                <h2>{person.user.username}</h2>
+              </div>
+            )
+          })}
         </div>
       </div>
     );

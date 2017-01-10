@@ -12,7 +12,7 @@ export default (
     <IndexRoute component={LoginView} />
     <Route path="404" component={NotFoundView} />
     <Route path="lobby" component={LobbyView} />
-    <Route path="staging/:gameId" component={StagingView} />
+    <Route path="staging" component={StagingView} />
     <Redirect from="*" to="404" />
   </Route>
 );

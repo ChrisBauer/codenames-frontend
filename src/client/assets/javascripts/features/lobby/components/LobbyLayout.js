@@ -3,8 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import { createNewGame } from '../lobby';
-import { validateUser } from '../../../validators';
+import { validateUser } from '../../../utils/validators';
 
 import './Lobby.scss';
 
@@ -26,11 +25,9 @@ export default class LobbyLayout extends Component {
       this.context.router.push('/');
     }
 
-    const newGameHandler = (user: User, name: string) => {
-      const game = createNewGame(user, name);
-      actions.addGames([game]);
-      actions.populateStaging(game);
-      this.context.router.push('/staging/0');
+    const newGameHandler = (userId: number, name: string) => {
+      actions.createGame(userId, name);
+      this.context.router.push('/staging');
     };
 
     const leaveLobby = () => {
@@ -39,8 +36,8 @@ export default class LobbyLayout extends Component {
     };
 
     const goToGame = (gameId) => {
-      actions.populateStaging(games.find(game => game.id == gameId));
-      this.context.router.push('/staging/' + gameId);
+      actions.selectGame(gameId);
+      this.context.router.push('/staging');
     };
 
     /*
@@ -59,7 +56,7 @@ export default class LobbyLayout extends Component {
         <div className="games">
           <h1>Games</h1>
           <hr />
-          <button onClick={() => newGameHandler(user, 'Testing')}>Create Game</button>
+          <button onClick={() => newGameHandler(currentUserId, 'Testing')}>Create Game</button>
           {Object.keys(games).map(id => (
             <div key={id} className="game" onClick={() => goToGame(id)}>{games[id].name}</div>
           ))}

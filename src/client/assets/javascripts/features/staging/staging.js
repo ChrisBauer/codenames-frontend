@@ -232,9 +232,8 @@ const ready = (player: Player) => ({
 });
 
 export const selector = createStructuredSelector({
-  staging: state => state[NAME],
-  login: state => state['login'],
-  lobby: state => state['lobby']
+  games: state => state.games,
+  users: state => state.users
 });
 
 export const actionCreators = {

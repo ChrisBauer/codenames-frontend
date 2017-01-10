@@ -6,13 +6,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { actionCreators as stagingActions, selector } from '../';
-import { actionCreators as loginActions } from '../../login';
-import { actionCreators as lobbyActions } from '../../lobby';
+import { selector } from '../';
+import { gameActions } from 'actions/gameActions';
+import { userActions } from 'actions/userActions';
+import { playerActions } from 'actions/playerActions';
 import StagingLayout from './StagingLayout';
 
 @connect(selector, (dispatch) => ({
-  actions: bindActionCreators({...loginActions, ...stagingActions, ...lobbyActions}, dispatch)
+  actions: bindActionCreators({...gameActions, ...userActions, ...playerActions}, dispatch)
 }))
 export default class StagingView extends Component {
   render() {
