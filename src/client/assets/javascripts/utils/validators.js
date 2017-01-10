@@ -6,7 +6,15 @@ export const validateUser = (users, currentUserId) => {
   return currentUserId != null && users[currentUserId];
 };
 
-export const checkTeamsAndRoles = (teams) => {
+const getTeams = (players) => {
+  return Object.keys(players).reduce((teams, id) => {
+    teams[players[id].team][id] = players[id];
+    return teams;
+  }, {RED: {}, BLUE: {}});
+};
+
+export const gameCanStart = (players) => {
+  const teams = getTeams(players);
   // Need at least 4 players
   if (Object.keys(teams.RED).length + Object.keys(teams.BLUE).length < 4) {
     return false;
@@ -28,4 +36,4 @@ export const checkTeamsAndRoles = (teams) => {
 
   // If all of these checks have passed then ogogogogogog.
   return true;
-}
+};

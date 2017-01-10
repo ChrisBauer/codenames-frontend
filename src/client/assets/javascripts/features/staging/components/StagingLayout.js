@@ -51,6 +51,11 @@ export default class StagingLayout extends Component {
     }
 
     const game = games[currentGameId];
+
+    if (game.status == 'IN_PROGRESS' && game.players[thisPerson.id]) {
+      this.context.router.push('/game');
+    }
+
     const teams = this.getTeams(users, game.players);
 
     const logout = () => {
@@ -64,15 +69,15 @@ export default class StagingLayout extends Component {
     };
 
     const changeTeam = () => {
-      actions.changeTeam(thisPerson.id);
+      actions.changeTeam(currentUserId);
     };
 
     const changeRole = () => {
-      actions.changeRole(thisPerson.id);
+      actions.changeRole(currentUserId);
     };
 
     const setReady = () => {
-      actions.setReady(thisPerson.id);
+      actions.setReady(currentUserId);
     };
 
 

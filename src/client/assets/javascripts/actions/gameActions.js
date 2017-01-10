@@ -10,16 +10,10 @@ const REMOVE_GAMES = 'codenames/actions/game/removeGames';
 const LEAVE_CURRENT_GAME = 'codenames/actions/game/leaveCurrentGame';
 const SELECT_GAME = 'codenames/actions/game/selectGame';
 
-import { CHANGE_TEAM, CHANGE_ROLE, SET_READY, reducer as playersReducer } from 'actions/playerActions';
+import { CHANGE_TEAM, CHANGE_ROLE, SET_READY, delegate as delegateToPlayersReducer, createPlayerFromUser } from 'actions/playerActions';
+import { PASS, GUESS, GIVE_CLUE, delegate as delegateToGameplayReducer } from 'actions/gameplayActions';
 
 let nextGameId = 0;
-
-const createPlayerFromUser = (userId) => ({
-  userId,
-  team: 'RED',
-  role: 'GUESSER',
-  ready: false
-});
 
 const createNewGame = (userId, name) => ({
   id: nextGameId++,
@@ -27,7 +21,8 @@ const createNewGame = (userId, name) => ({
   status: 'PENDING',
   players: {
     [userId]: createPlayerFromUser(userId)
-  }
+  },
+  play: {},
 });
 
 const initialState = {
@@ -102,18 +97,13 @@ export const reducer = (state = initialState, action) => {
     case CHANGE_TEAM:
     case CHANGE_ROLE:
     case SET_READY:
-      gameId = state.currentGameId;
-      game = Object.assign({}, state.games[gameId]);
-      action.player = game.players[action.userId];
-      game.players = playersReducer(game.players, action);
+      return delegateToPlayersReducer(state, action);
 
-      return {
-        ...state,
-        games: {
-          ...state.games,
-          [gameId]: game
-        }
-      };
+
+    case GUESS:
+    case PASS:
+    case GIVE_CLUE:
+      return delegateToGameplayReducer(state, action);
 
     default:
       return state;
