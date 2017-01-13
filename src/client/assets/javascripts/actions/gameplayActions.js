@@ -7,6 +7,12 @@ export const PASS = 'codenames/actions/gameplay/pass';
 export const GIVE_CLUE = 'codenames/actions/gameplay/giveClue';
 export const SUGGEST_TO_TEAM = 'codenames/actions/gameplay/suggestToTeam';
 
+export const ACTION_TYPES = {
+  GUESS: 'Guess',
+  GIVE_CLUE: 'Give Clue',
+  PASS: 'Pass'
+};
+
 export const delegate = (state, action) => {
   gameId = state.currentGameId;
   if (gameId == null) {
@@ -32,7 +38,7 @@ const getInitialState = () => {
   const board = generateBoard();
   const redFirst = board.filter(card => card.color == 'RED').length == 9;
   return {
-    board,
+    board: [],
     nextMove: redFirst ? 'RED' : 'BLUE',
     nextMoveType: 'GIVE_CLUE',
     guessesRemaining: 0,
@@ -153,11 +159,10 @@ export const pass = (userId) => ({
   userId
 });
 
-export const guess = (userId, action, cardIndex) => ({
+export const guess = (userId, card) => ({
   type: GUESS,
   userId,
-  action,
-  cardIndex
+  card
 });
 
 export const giveClue = (userId, word, count) => ({

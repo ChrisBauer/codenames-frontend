@@ -1,0 +1,36 @@
+
+
+.game {
+  display: flex;
+}
+
+.card {
+  width: 200px;
+  height: 120px;
+  background-color: #fff;
+  border: 1px #b5b59c solid;
+  border-radius: 5px;
+  margin: 10px;
+
+  text-align: center;
+  font-size: 32px;
+
+  .beige {
+    background-color: #f5f5dc;
+  }
+
+  .blue {
+    background-color: #014c8c;
+    color: #fff;
+  }
+
+  .red {
+    background-color: #8b0000;
+    color: #fff;
+  }
+
+  .black {
+    background-color: #333;
+    color: #fff;
+  }
+}
