@@ -6,6 +6,7 @@
 import React, { Component, PropTypes } from 'react';
 import {Player} from 'models/user';
 import {ACTION_TYPES} from 'actions/gameplayActions';
+import Sidebar from './sidebar';
 
 import './Game.scss';
 
@@ -21,14 +22,6 @@ export default class GameLayout extends Component {
   };
 
   getPerson (users, players, userId) {
-    return {
-      user: users[userId],
-      player: players[userId],
-      id: userId
-    };
-  }
-
-  getCurrentGame (games, gameId) {
     return {
       user: users[userId],
       player: players[userId],
@@ -88,44 +81,36 @@ export default class GameLayout extends Component {
     return false;
   }
 
+  logout () {
+    this.props.actions.logoutCurrentUser();
+    this.context.router.push('/');
+  }
+
+  leaveGame () {
+    this.props.actions.leaveCurrentGame();
+    this.context.router.push('/lobby');
+  };
+
   render() {
     console.log(this.props);
     const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
 
-    const { game, thisPerson, teams, gameplay } = this.verifyState(users, games, currentUserId, currentGameId);
-
-    const logout = () => {
-      actions.logoutCurrentUser();
-      this.context.router.push('/');
-    };
-
-    const leaveGame = () => {
-      actions.leaveCurrentGame();
-      this.context.router.push('/lobby');
-    };
+    const { thisPerson, gameplay } = this.verifyState(users, games, currentUserId, currentGameId);
 
     const cardAction = (card) => {
       const action = this.validateAction(thisPerson, gameplay, ACTION_TYPES.GUESS);
       if (action) {
-        action(userId, card);
+        action(currentUserId, card);
       }
-    };
-
-    const giverSidebar = () => {
-      if (thisPerson.player.role == 'GIVER') {
-        return <CluegiverSidebar props={...this.props} />;
-      }
-      return '';
     };
 
     // TODO: break giver/guesser into separate components?
     // TODO: Or: GamePage, GameBoard, GiverSidebar, GuesserSidebar
     return (
       <div className="game-page">
-        <a onClick={logout}>Logout</a>
-        <a onClick={leaveGame}>Leave Game</a>
+        <a onClick={this.logout}>Logout</a>
+        <a onClick={this.leaveGame}>Leave Game</a>
         <div className="game">
-          <p><span className="move">{gameplay.nextMove}</span> team: <span className="type">{gameplay.nextMoveType}</span></p>
           <div className="board">
             {gameplay.board.map(card => {
               let classes = 'card';
@@ -133,11 +118,11 @@ export default class GameLayout extends Component {
                 classes += ` ${card.color}`;
               }
               return (
-                <div className={classes} onClick={cardAction(card)}>{card.word}</div>
+                <div key={card.id} className={classes} onClick={() => cardAction(card)}>{card.word}</div>
               );
             })}
           </div>
-          {giverSidebar()}
+          <Sidebar person={thisPerson} gameplay={gameplay} actions={actions} />
         </div>
       </div>
     );

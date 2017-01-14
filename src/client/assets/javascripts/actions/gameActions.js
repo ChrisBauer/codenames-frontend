@@ -22,7 +22,7 @@ const createNewGame = (userId, name) => ({
   players: {
     [userId]: createPlayerFromUser(userId)
   },
-  play: {},
+  play: {}
 });
 
 const initialState = {

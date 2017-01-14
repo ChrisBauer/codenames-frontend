@@ -4,6 +4,7 @@
 
 import {objectWithout} from 'utils/utils';
 import {gameCanStart} from 'utils/validators';
+import {delegate as gameplayDelegate} from './gameplayActions';
 
 export const ADD_PLAYERS = 'codenames/actions/players/addPlayers';
 export const REMOVE_PLAYERS = 'codenames/actions/players/removePlayers';
@@ -34,6 +35,7 @@ export const delegate = (state, action) => {
   game.players = reducer(game.players, action);
 
   if (action.type == SET_READY && gameCanStart(game.players)) {
+    game.play = gameplayDelegate();
     game.status = 'IN_PROGRESS';
   }
 

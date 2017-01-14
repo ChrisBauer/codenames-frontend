@@ -2,6 +2,8 @@
  * Created by chris on 1/9/17.
  */
 
+import {wordList, CardState, CardColor} from 'models/card';
+
 export const GUESS = 'codenames/actions/gameplay/guess';
 export const PASS = 'codenames/actions/gameplay/pass';
 export const GIVE_CLUE = 'codenames/actions/gameplay/giveClue';
@@ -14,7 +16,10 @@ export const ACTION_TYPES = {
 };
 
 export const delegate = (state, action) => {
-  gameId = state.currentGameId;
+  if (!state) {
+    return getInitialState();
+  }
+  const gameId = state.currentGameId;
   if (gameId == null) {
     return state;
   }
@@ -34,11 +39,54 @@ const getOtherTeam = (team) => {
   return team == 'RED' ? 'BLUE' : 'RED';
 };
 
+const generateBoard = (firstTeam = 'RED') => {
+
+  const getNextWord = (alreadyUsed, wordList) => {
+    let nextIndex = Math.random() * wordList.length | 0;
+    while(alreadyUsed.indexOf(nextIndex) != -1) {
+      nextIndex++;
+    }
+    alreadyUsed.push(nextIndex);
+    return wordList[nextIndex];
+  };
+
+  const board = [];
+  const alreadyUsed = [];
+  let i;
+  for (i = 0; i < 25; i++) {
+    const nextWord = getNextWord(alreadyUsed, wordList);
+    const newCard = {word: nextWord, state: CardState.FRESH, key: alreadyUsed[alreadyUsed.length - 1]};
+    if (i < 8) {
+      newCard.color = 'RED';
+    }
+    else if (i < 16) {
+      newCard.color = 'BLUE';
+    }
+    else if (i < 23) {
+      newCard.color = 'BROWN';
+    }
+    else if (i == 23) {
+      newCard.color = 'BLACK';
+    }
+    else {
+      newCard.color = firstTeam;
+    }
+    board.push(newCard);
+  }
+  for (i = 0; i < board.length; i++) {
+    const swapIndex = Math.random() * board.length | 0;
+    const swapCard = board[swapIndex];
+    board[swapIndex] = board[i];
+    board[i] = swapCard;
+  }
+  return board;
+};
+
 const getInitialState = () => {
   const board = generateBoard();
   const redFirst = board.filter(card => card.color == 'RED').length == 9;
   return {
-    board: [],
+    board: board,
     nextMove: redFirst ? 'RED' : 'BLUE',
     nextMoveType: 'GIVE_CLUE',
     guessesRemaining: 0,
@@ -73,8 +121,12 @@ export const reducer = (state = getInitialState(), action) => {
       if (state.nextMoveType != 'GUESS' || player.team != state.nextMove) {
         return state;
       }
-      move = {player, action: 'GUESS', card: board[action.cardIndex]};
-      const card = Object.assign({}, board[action.cardIndex]);
+      // If it's already been guessed, ignore it.
+      if (state.board[action.cardIndex].status == 'GUESSED') {
+        return state;
+      }
+      move = {player, action: 'GUESS', card: state.board[action.cardIndex]};
+      const card = Object.assign({}, state.board[action.cardIndex]);
       card.revealed = true;
       if (card.color == 'BLACK') {
         // Assassin card
@@ -84,9 +136,9 @@ export const reducer = (state = getInitialState(), action) => {
           play: {
             ...state.play,
             board: [
-              ...board.slice(0, cardIndex),
+              ...state.board.slice(0, action.cardIndex),
               card,
-              ...board.slice(cardIndex + 1)
+              ...state.board.slice(action.cardIndex + 1)
             ],
             moves: [...state.play.moves, move],
             nextTurn: getOtherTeam(player.team)
@@ -100,9 +152,9 @@ export const reducer = (state = getInitialState(), action) => {
             ...state.play,
             guessesRemaining: state.play.guessesRemaining - 1,
             board: [
-              ...board.slice(0, cardIndex),
+              ...state.board.slice(0, action.cardIndex),
               card,
-              ...board.slice(cardIndex + 1)
+              ...state.board.slice(action.cardIndex + 1)
             ],
             moves: [...state.play.moves, move],
             nextTurn: player.team
@@ -117,9 +169,9 @@ export const reducer = (state = getInitialState(), action) => {
             ...state.play,
             guessesRemaining: 0,
             board: [
-              ...board.slice(0, cardIndex),
+              ...state.board.slice(0, action.cardIndex),
               card,
-              ...board.slice(cardIndex + 1)
+              ...state.board.slice(action.cardIndex + 1)
             ],
             moves: [...state.play.moves, move],
             nextMoveType: 'GIVE_CLUE',

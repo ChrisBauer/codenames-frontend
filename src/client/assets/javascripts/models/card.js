@@ -2,8 +2,11 @@
  * Created by chris on 1/3/17.
  */
 
-export type CardState =
- | "FRESH" | "GUESSED" | "SUGGESTED";
+export const CardState = {
+  FRESH: "FRESH",
+  GUESSED: "GUESSED",
+  SUGGESTED: "SUGGESTED"
+};
 
 export type CardColor =
  | "RED" | "BLUE" | "BROWN" | "BLACK";

@@ -6,6 +6,6 @@
 import { createStructuredSelector } from 'reselect';
 
 export const selector = createStructuredSelector({
-  game: state => state.game,
+  games: state => state.games,
   users: state => state.users
 });
