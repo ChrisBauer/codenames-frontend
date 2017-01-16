@@ -66,10 +66,11 @@ export default class GameLayout extends Component {
 
   validateAction (thisPerson, gameplay, actionType) {
     if (gameplay.nextMove == thisPerson.player.team) {
-      if (gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE && thisPerson.player.role == 'GIVER') {
+      if (actionType == ACTION_TYPES.GIVE_CLUE && gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE && thisPerson.player.role == 'GIVER') {
         return this.props.actions.giveClue;
       }
-      if (gameplay.nextMoveType == ACTION_TYPES.GUESS && thisPerson.player.role == 'GUESSER') {
+      if ((actionType == ACTION_TYPES.GUESS || actionType == ACTION_TYPES.PASS) &&
+          gameplay.nextMoveType == ACTION_TYPES.GUESS && thisPerson.player.role == 'GUESSER') {
         if (actionType == ACTION_TYPES.GUESS) {
           return this.props.actions.guess;
         }
@@ -118,7 +119,7 @@ export default class GameLayout extends Component {
                 classes += ` ${card.color}`;
               }
               return (
-                <div key={card.id} className={classes} onClick={() => cardAction(card)}>{card.word}</div>
+                <div key={card.key} className={classes} onClick={() => cardAction(card)}>{card.word}</div>
               );
             })}
           </div>

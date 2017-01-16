@@ -7,3 +7,12 @@ export const objectWithout = (object, withoutKeys) => {
   withoutKeys.forEach(key => delete obj[key]);
   return obj;
 };
+
+export const findLast = (arr, fn) => {
+  let i = arr.length;
+  while (i-- > 0) {
+    if (fn(arr[i])) {
+      return arr[i];
+    }
+  }
+};

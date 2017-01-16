@@ -3,6 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
+import {findLast} from 'utils/utils';
 import {Player} from 'models/user';
 import {ACTION_TYPES} from 'actions/gameplayActions';
 import Giver from './Giver';
@@ -29,7 +30,6 @@ export default class Sidebar extends Component {
     );
   }
 
-
   render() {
     const { person, gameplay, actions } = this.props;
     let gameActions;
@@ -39,10 +39,17 @@ export default class Sidebar extends Component {
     if (person.player.role == 'GUESSER') {
       gameActions = this.renderGuesser(person, gameplay, actions);
     }
+    const lastClue = gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE ? undefined : (
+        <div>
+          <p>Last Clue: {gameplay.clue}</p>
+          <p>Guesses remaining: {gameplay.guessesRemaining}</p>
+        </div>
+      );
 
     return (
       <div className="sidebar">
         <p><span className="move">{gameplay.nextMove}</span> team: <span className="type">{gameplay.nextMoveType}</span></p>
+        {lastClue}
         {gameActions}
       </div>
     );

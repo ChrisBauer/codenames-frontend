@@ -88,7 +88,7 @@ const getInitialState = () => {
   return {
     board: board,
     nextMove: redFirst ? 'RED' : 'BLUE',
-    nextMoveType: 'GIVE_CLUE',
+    nextMoveType: ACTION_TYPES.GIVE_CLUE,
     guessesRemaining: 0,
     clue: '',
     moves: []
@@ -103,29 +103,29 @@ export const reducer = (state = getInitialState(), action) => {
   switch(action.type) {
     case PASS:
       // Make sure it's a valid time to pass
-      if (state.nextMoveType != 'GUESS' || player.team != state.nextMove) {
+      if (state.nextMoveType != ACTION_TYPES.GUESS || player.team != state.nextMove) {
         return state;
       }
-      move = {player, action: 'PASS'};
+      move = {player, action: ACTION_TYPES.PASS};
       return {
         ...state,
         play: {
           ...state.play,
           moves: [...state.play.moves, move],
           nextMove: getOtherTeam(player.team),
-          nextMoveType: 'GIVE_CLUE'
+          nextMoveType: ACTION_TYPES.GIVE_CLUE
         }
       };
     case GUESS:
       // Make sure it's a valid time to guess
-      if (state.nextMoveType != 'GUESS' || player.team != state.nextMove) {
+      if (state.nextMoveType != ACTION_TYPES.GUESS || player.team != state.nextMove) {
         return state;
       }
       // If it's already been guessed, ignore it.
       if (state.board[action.cardIndex].status == 'GUESSED') {
         return state;
       }
-      move = {player, action: 'GUESS', card: state.board[action.cardIndex]};
+      move = {player, action: ACTION_TYPES.GUESS, card: state.board[action.cardIndex]};
       const card = Object.assign({}, state.board[action.cardIndex]);
       card.revealed = true;
       if (card.color == 'BLACK') {
@@ -174,7 +174,7 @@ export const reducer = (state = getInitialState(), action) => {
               ...state.board.slice(action.cardIndex + 1)
             ],
             moves: [...state.play.moves, move],
-            nextMoveType: 'GIVE_CLUE',
+            nextMoveType: ACTION_TYPES.GIVE_CLUE,
             clue: '',
             nextTurn: getOtherTeam(player.team)
           }
@@ -182,7 +182,7 @@ export const reducer = (state = getInitialState(), action) => {
       }
 
     case GIVE_CLUE:
-      if (state.nextMoveType != 'GIVE_CLUE' || player.team != state.nextMove) {
+      if (state.play.nextMoveType != ACTION_TYPES.GIVE_CLUE || player.team != state.play.nextMove) {
         return state;
       }
       return {
@@ -191,8 +191,8 @@ export const reducer = (state = getInitialState(), action) => {
           ...state.play,
           guessesRemaining: action.count,
           clue: action.clue,
-          moves: [...state.play.moves, {action: 'GIVE_CLUE'}],
-          nextMoveType: 'GUESS'
+          moves: [...state.play.moves, {action: ACTION_TYPES.GIVE_CLUE, clue: action.clue, count: action.count}],
+          nextMoveType: ACTION_TYPES.GUESS
         }
       };
 
@@ -217,9 +217,15 @@ export const guess = (userId, card) => ({
   card
 });
 
-export const giveClue = (userId, word, count) => ({
+export const giveClue = (userId, clue, count) => ({
   type: GIVE_CLUE,
   userId,
-  word,
+  clue,
   count
 });
+
+export const gameplayActions = {
+  pass,
+  guess,
+  giveClue
+};

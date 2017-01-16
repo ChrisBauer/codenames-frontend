@@ -22,15 +22,17 @@ export default class Giver extends Component {
     if (this.count.value == '' || this.count.value == null) {
       return 'Invalid count';
     }
-    this.props.actions.giveClue(person.id, this.clue.value, this.count.value);
+    this.props.actions.giveClue(person.id, this.clue.value, +this.count.value);
   }
 
   getCluegiverContent(person, gameplay) {
-    if (gameplay.nextMove == person.player.team && gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE) {
+    if (gameplay.nextMove == person.player.team &&
+        gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE &&
+        person.player.role == 'GIVER') {
       return (
         <div className="clue-form">
           <input ref={input => {this.clue = input; }} placeholder="Clue" />
-          <input ref={input => {this.count = input; }} type="number" value="1" />
+          <input ref={input => {this.count = input; }} type="number" defaultValue="1" />
           <button onClick={() => this.giveClue(person)}>Give Clue</button>
         </div>
       );
