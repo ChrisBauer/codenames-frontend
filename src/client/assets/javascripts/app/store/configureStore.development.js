@@ -3,6 +3,7 @@ import thunk from 'redux-thunk';
 import { persistState } from 'redux-devtools';
 import promiseMiddleware from 'redux-promise';
 import createLogger from 'redux-logger';
+import horizonRedux from '../horizon/redux';
 
 import rootReducer from '../reducer';
 import DevTools from '../DevTools';
@@ -14,8 +15,9 @@ import DevTools from '../DevTools';
  * with your standard DevTools monitor gives you great flexibility.
  */
 const logger = createLogger();
+const hzMiddleware = horizonRedux.createMiddleware();
 
-const middlewares = [thunk, promiseMiddleware, logger, require('redux-immutable-state-invariant')()];
+const middlewares = [thunk, hzMiddleware, promiseMiddleware, logger, require('redux-immutable-state-invariant')()];
 
 // By default we try to read the key from ?debug_session=<key> in the address bar
 const getDebugSessionKey = function () {
