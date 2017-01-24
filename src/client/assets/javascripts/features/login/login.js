@@ -7,5 +7,6 @@ import { createStructuredSelector } from 'reselect';
 import { User } from 'models/user';
 
 export const selector = createStructuredSelector({
-  currentUserId: (state) => state.currentUserId
+  users: state => state.users.users,
+  currentUserId: state => state.users.currentUserId
 });

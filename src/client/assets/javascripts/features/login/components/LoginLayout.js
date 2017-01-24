@@ -5,11 +5,13 @@
 import React, { Component, PropTypes } from 'react';
 
 import './Login.scss';
+import { validateUser } from 'utils/validators';
 
 export default class LoginLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    currentUserId: PropTypes.number
+    users: PropTypes.object,
+    currentUserId: PropTypes.string
   };
 
   static contextTypes = {
@@ -19,16 +21,15 @@ export default class LoginLayout extends Component {
   render() {
     console.log(this.props);
     console.log('in render function');
-    const { currentUserId, actions } = this.props;
+    const { users, currentUserId, actions } = this.props;
 
-    if (currentUserId) {
+    if (currentUserId && validateUser(users, currentUserId)) {
       this.context.router.push('/lobby');
     }
 
     const loginHandler = () => {
       if (this.loginInput.value) {
-        actions.createUser(this.loginInput.value);
-        this.context.router.push('/lobby');
+        actions.loginUser(this.loginInput.value);
       }
     };
 

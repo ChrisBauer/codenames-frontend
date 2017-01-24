@@ -3,7 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import { validateUser } from '../../../utils/validators';
+import { validateUser } from 'utils/validators';
 
 import './Lobby.scss';
 
@@ -32,7 +32,7 @@ export default class LobbyLayout extends Component {
     };
 
     const leaveLobby = () => {
-      actions.logoutCurrentUser();
+      actions.logoutCurrentUser(currentUserId);
       this.context.router.push('/');
     };
 

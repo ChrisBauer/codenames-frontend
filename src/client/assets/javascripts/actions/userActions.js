@@ -2,96 +2,104 @@
  * Created by chris on 1/7/17.
  */
 
-const CREATE_USER = 'codenames/actions/user/createUser';
-const ADD_USERS = 'codenames/actions/user/addUsers';
-const REMOVE_USERS = 'codenames/actions/user/removeUsers';
+import horizonRedux from 'app/horizon/redux';
+
+const LOGIN_USER = 'codenames/actions/user/loginUser';
 const LOGOUT_CURRENT_USER = 'codenames/actions/user/logoutCurrentUser';
+const SET_CURRENT_USER = 'codenames/actions/user/setCurrentUser';
+const UPDATE_USERS = 'codenames/actions/user/updateUsers';
 
-let nextUserId = 0;
+const WATCH_USERS = 'codenames/actions/user/watchUsers';
 
-const createNewUser = (username) => {
-  return {
-    id: nextUserId++,
-    username: username
+horizonRedux.takeLatest(
+  LOGIN_USER,
+  (horizon, action) =>
+    horizon('activeUsers').store({username: action.username}),
+  (response, action, dispatch) => {
+    dispatch(setCurrentUser(response.id));
+    dispatch(watchUsers());
+  },
+  (err, action, dispatch) => {
+    console.err('failed to add user', err);
   }
-};
+);
+
+horizonRedux.takeLatest(
+  LOGOUT_CURRENT_USER,
+  (horizon, action) =>
+    horizon('activeUsers').remove({id: action.id}),
+  (response, action, dispatch) => {
+  },
+  (err) => {
+    console.err('failed to log out', err);
+  }
+);
+
+horizonRedux.takeLatest(
+  WATCH_USERS,
+  (horizon, action) =>
+    horizon('activeUsers').order('username').limit(100).watch(),
+  (result, action, dispatch) => {
+    dispatch(updateUsers(result));
+  },
+  (err) => {
+    console.err('failed to load users', err);
+  }
+);
 
 const initialState = {
   currentUserId: null,
   users: {}
 };
 
-const getUsersWithout = (users, withoutIds) => {
-  const returnUsers = Object.assign({}, users);
-  if (withoutIds) {
-    withoutIds.forEach(id => delete returnUsers[id]);
-  }
-  return returnUsers;
-};
-
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case CREATE_USER:
-      const user = createNewUser(action.username);
-      return {
-        currentUserId: user.id,
-        users: {
-          ...state.users,
-          [user.id]: user
-        }
-      };
-
-    case ADD_USERS:
+    case SET_CURRENT_USER:
       return {
         ...state,
-        users: {
-          ...state.users,
-          ...action.users.reduce((users, user) => {
-            users[user.id] = user;
-            return users;
-          }, {})
-        }
+        currentUserId: action.id
       };
-
-    case REMOVE_USERS:
+    case UPDATE_USERS:
       return {
         ...state,
-        users: getUsersWithout(state.users, action.userIds)
-      };
-
-    case LOGOUT_CURRENT_USER:
-      return {
-        currentUserId: null,
-        users: getUsersWithout(state.users, [state.currentUserId])
+        users: action.users.reduce((acc, user) => {acc[user.id] = user; return acc;}, {})
       };
 
     default:
       return state;
   }
 };
-
-export const createUser = (username) => ({
-  type: CREATE_USER,
+export const loginUser = (username) => ({
+  type: LOGIN_USER,
   username
 });
 
-export const addUsers = (users) => ({
-  type: ADD_USERS,
+export const logoutCurrentUser = (id) => ({
+  type: LOGOUT_CURRENT_USER,
+  id
+});
+
+export const setCurrentUser = (id) => ({
+  type: SET_CURRENT_USER,
+  id
+});
+
+export const updateUsers = (users) => ({
+  type: UPDATE_USERS,
   users
 });
 
-export const removeUsers = (userIds) => ({
-  type: REMOVE_USERS,
-  userIds
-});
-
-export const logoutCurrentUser = () => ({
-  type: LOGOUT_CURRENT_USER
-});
-
 export const userActions = {
-  createUser,
-  addUsers,
-  removeUsers,
-  logoutCurrentUser
+  loginUser,
+  logoutCurrentUser,
+  setCurrentUser,
+  updateUsers,
 };
+
+
+
+// INTERNAL ONLY ACTIONS:
+
+export const watchUsers = () => ({
+  type: WATCH_USERS
+});
