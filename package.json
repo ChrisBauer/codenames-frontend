@@ -96,7 +96,7 @@
     "classnames": "2.2.5",
     "express": "4.14.0",
     "horizon": "2.0.0",
-    "horizon-redux": "2.2.0",
+    "horizon-redux-cb-mod": "2.2.0",
     "lodash": "4.15.0",
     "raven-js": "3.6.1",
     "react": "15.3.1",
