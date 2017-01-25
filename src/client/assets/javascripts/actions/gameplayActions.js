@@ -3,6 +3,7 @@
  */
 
 import {wordList, CardState, CardColor} from 'models/card';
+import {Observable} from 'rxjs';
 
 import {getCurrentUserId, getUser, getCurrentGameId, getGame, getGamePlayerFromUser} from 'utils/stateTraversal';
 import {gameCanStart} from 'utils/validators';
@@ -26,12 +27,12 @@ horizonRedux.takeLatest(
     const state = getState();
     const currentGameId = getCurrentGameId(state);
     if (currentGameId != action.gameId) {
-      return;
+      return Observable.empty();
     }
 
     const game = getGame(state, action.gameId);
     if (!gameCanStart(game.players)) {
-      return;
+      return Observable.empty();
     }
 
     game.play = getInitialState();
@@ -52,11 +53,11 @@ horizonRedux.takeLatest(
     const game = getGame(state, gameId);
     const player = getGamePlayerFromUser(state, gameId, userId);
     if (!gameId || !userId || !game || !player) {
-      return;
+      return Observable.empty();
     }
     const gameplay = game.play;
     if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != 'GUESSER') {
-      return;
+      return Observable.empty();
     }
     const move = {userId, action: ACTION_TYPES.PASS};
     const newGameplay = {
@@ -79,17 +80,17 @@ horizonRedux.takeLatest(
     const game = getGame(state, gameId);
     const player = getGamePlayerFromUser(state, gameId, userId);
     if (!gameId || !userId || !game || !player) {
-      return;
+      return Observable.empty();
     }
 
     const gameplay = game.play;
     // Make sure it's a valid time to guess
     if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != 'GUESSER') {
-      return;
+      return Observable.empty();
     }
     // If it's already been guessed, ignore it.
     if (action.card.status == 'GUESSED') {
-      return;
+      return Observable.empty();
     }
 
     action.card.status = 'GUESSED';
@@ -142,13 +143,13 @@ horizonRedux.takeLatest(
     const game = getGame(state, gameId);
     const player = getGamePlayerFromUser(state, gameId, userId);
     if (!gameId || !userId || !game || !player) {
-      return;
+      return Observable.empty();
     }
 
     const gameplay = game.play;
 
     if (gameplay.nextMoveType != ACTION_TYPES.GIVE_CLUE || player.team != gameplay.nextMove || player.role != 'GIVER') {
-      return;
+      return Observable.empty();
     }
 
     const move = {

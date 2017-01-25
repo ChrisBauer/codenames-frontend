@@ -2,6 +2,7 @@
  * Created by chris on 1/7/17.
  */
 
+import {Observable} from 'rxjs';
 import horizonRedux from 'app/horizon/redux';
 
 const LOGIN_USER = 'codenames/actions/user/loginUser';
@@ -28,9 +29,11 @@ horizonRedux.takeLatest(
   LOGOUT_CURRENT_USER,
   (horizon, action, getState) => {
     const currentUserId = getState().users.currentUserId;
-    if (currentUserId) {
-      horizon('activeUsers').remove({id: currentUserId});
+    if (!currentUserId) {
+      return Observable.empty();
     }
+
+    return horizon('activeUsers').remove({id: currentUserId});
   },
   (response, action, dispatch) => {
     dispatch(setCurrentUser(null));

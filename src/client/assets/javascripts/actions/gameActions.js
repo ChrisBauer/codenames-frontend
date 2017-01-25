@@ -3,6 +3,7 @@
  */
 
 import horizonRedux from 'app/horizon/redux';
+import {Observable} from 'rxjs';
 import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame, getPlayersWithoutUser, getPlayersPlusPlayer} from 'utils/stateTraversal';
 
 const CREATE_GAME = 'codenames/actions/game/createGame';
@@ -43,22 +44,23 @@ horizonRedux.takeLatest(
     const state = getState();
     const gameId = getCurrentGameId(state);
     const userId = getCurrentUserId(state);
-    if (gameId && userId && getGame(state, gameId)) {
-
-      // This logic should probably be moved to the server.
-      const newPlayers = getPlayersWithoutUser(state, gameId, userId);
-
-      // If there are no players left after removing the current player, delete the game.
-      if (Object.keys(newPlayers).length == 0) {
-        return horizon('games').remove({id: gameId});
-      }
-
-      // Note that we can't remove one key from a nested field, so we have to replace the whol
-      // object with out the player
-      const game = getGame(state, gameId);
-      game.players = newPlayers;
-      return horizon('games').replace(game);
+    if (!gameId || !userId || !getGame(state, gameId)) {
+      return Observable.empty();
     }
+
+    // This logic should probably be moved to the server.
+    const newPlayers = getPlayersWithoutUser(state, gameId, userId);
+
+    // If there are no players left after removing the current player, delete the game.
+    if (Object.keys(newPlayers).length == 0) {
+      return horizon('games').remove({id: gameId});
+    }
+
+    // Note that we can't remove one key from a nested field, so we have to replace the whol
+    // object with out the player
+    const game = getGame(state, gameId);
+    game.players = newPlayers;
+    return horizon('games').replace(game);
   },
   (result, action, dispatch) => dispatch(setCurrentGame(null)),
   err => console.err('failed leaving game', err)
@@ -70,11 +72,12 @@ horizonRedux.takeLatest(
     const state = getState();
     const userId = getCurrentUserId(state);
     const game = getGame(state, action.gameId);
-    if (userId && game) {
-      const newPlayer = createPlayerFromUser(userId);
-      // Note that update effectively does a merge, so we don't need to merge the players
-      return horizon('games').update({id: action.gameId, players: {[userId]: newPlayer}});
+    if (!userId || !game) {
+      return Observable.empty();
     }
+    const newPlayer = createPlayerFromUser(userId);
+    // Note that update effectively does a merge, so we don't need to merge the players
+    return horizon('games').update({id: action.gameId, players: {[userId]: newPlayer}});
   },
   (result, action, dispatch) => dispatch(setCurrentGame(result.id)),
   err => console.err('failed joining game', err)

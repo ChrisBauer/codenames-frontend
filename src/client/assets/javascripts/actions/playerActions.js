@@ -3,6 +3,7 @@
  */
 
 import {objectWithout} from 'utils/utils';
+import {Observable} from 'rxjs';
 import horizonRedux from 'app/horizon/redux';
 
 import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame,
@@ -37,13 +38,13 @@ horizonRedux.takeLatest(
     const userId = getCurrentUserId(state);
     const gameId = getCurrentGameId(state);
     if (!userId || !gameId) {
-      return;
+      return Observable.empty();
     }
 
     const players = resetReady(getGame(state, gameId).players);
 
     if (!players[userId]) {
-      return;
+      return Observable.empty();
     }
     const player = players[userId];
     player.team = getOtherTeam(player.team);
@@ -60,13 +61,13 @@ horizonRedux.takeLatest(
     const userId = getCurrentUserId(state);
     const gameId = getCurrentGameId(state);
     if (!userId || !gameId) {
-      return;
+      return Observable.empty();
     }
 
     const players = resetReady(getGame(state, gameId).players);
 
     if (!players[userId]) {
-      return;
+      return Observable.empty();
     }
     const player = players[userId];
     player.role = getOtherRole(player.role);
@@ -83,7 +84,7 @@ horizonRedux.takeLatest(
     const userId = getCurrentUserId(state);
     const gameId = getCurrentGameId(state);
     if (!userId || !gameId) {
-      return;
+      return Observable.empty();
     }
 
     const player = getGamePlayerFromUser(state, gameId, userId);
