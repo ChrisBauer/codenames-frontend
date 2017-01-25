@@ -13,6 +13,16 @@
   }
 }
 
+.gameList {
+  margin: 20px 0;
+  padding: 0;
+  .game {
+    list-style-type: none;
+    font-size: initial;
+    cursor: pointer;
+  }
+}
+
 a {
   cursor: pointer;
 }

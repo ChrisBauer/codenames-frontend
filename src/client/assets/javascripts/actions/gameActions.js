@@ -3,20 +3,85 @@
  */
 
 import objectWithout from 'utils/utils';
+import horizonRedux from 'app/horizon/redux';
+import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame, getPlayersWithoutUser, getPlayersPlusPlayer} from 'utils/stateTraversal';
 
 const CREATE_GAME = 'codenames/actions/game/createGame';
-const ADD_GAMES = 'codenames/actions/game/addGames';
-const REMOVE_GAMES = 'codenames/actions/game/removeGames';
+const UPDATE_GAMES = 'codenames/actions/game/updateGames';
 const LEAVE_CURRENT_GAME = 'codenames/actions/game/leaveCurrentGame';
 const SELECT_GAME = 'codenames/actions/game/selectGame';
+const SET_CURRENT_GAME = 'codenames/actions/game/setCurrentGame';
+
+const WATCH_GAMES = 'codenames/actions/game/watchGames';
 
 import { ADD_PLAYERS, REMOVE_PLAYERS, CHANGE_TEAM, CHANGE_ROLE, SET_READY, delegate as delegateToPlayersReducer, createPlayerFromUser } from 'actions/playerActions';
 import { PASS, GUESS, GIVE_CLUE, delegate as delegateToGameplayReducer } from 'actions/gameplayActions';
 
-let nextGameId = 0;
+horizonRedux.takeLatest(
+  CREATE_GAME,
+  (horizon, action) => {
+    const game = createNewGame(action.userId, action.name);
+    return horizon('games').store(game);
+  },
+  (response, action, dispatch) => dispatch(setCurrentGame(response.id)),
+  err => console.err('failed to create game', err)
+);
+
+horizonRedux.takeLatest(
+  WATCH_GAMES,
+  (horizon, action) =>
+    horizon('games').findAll({status: 'PENDING'}).order('name').limit(100).watch(),
+  (result, action, dispatch) => {
+    const games = result.reduce((acc, game) => {acc[game.id] = game; return acc;}, {});
+    dispatch(updateGames(games));
+  },
+  err => console.err('failed to fetch games', err)
+);
+
+horizonRedux.takeLatest(
+  LEAVE_CURRENT_GAME,
+  (horizon, action, getState) => {
+    const state = getState();
+    const gameId = getCurrentGameId(state);
+    const userId = getCurrentUserId(state);
+    if (gameId && userId && getGame(state, gameId)) {
+
+      // This logic should probably be moved to the server.
+      const newPlayers = getPlayersWithoutUser(state, gameId, userId);
+
+      // If there are no players left after removing the current player, delete the game.
+      if (Object.keys(newPlayers).length == 0) {
+        return horizon('games').remove({id: gameId});
+      }
+
+      // Note that we can't remove one key from a nested field, so we have to replace the whol
+      // object with out the player
+      const game = getGame(state, gameId);
+      game.players = newPlayers;
+      return horizon('games').replace(game);
+    }
+  },
+  (result, action, dispatch) => dispatch(setCurrentGame(null)),
+  err => console.err('failed leaving game', err)
+);
+
+horizonRedux.takeLatest(
+  SELECT_GAME,
+  (horizon, action, getState) => {
+    const state = getState();
+    const userId = getCurrentUserId(state);
+    const game = getGame(state, action.gameId);
+    if (userId && game) {
+      const newPlayer = createPlayerFromUser(userId);
+      // Note that update effectively does a merge, so we don't need to merge the players
+      return horizon('games').update({id: action.gameId, players: {[userId]: newPlayer}});
+    }
+  },
+  (result, action, dispatch) => dispatch(setCurrentGame(result.id)),
+  err => console.err('failed joining game', err)
+);
 
 const createNewGame = (userId, name) => ({
-  id: nextGameId++,
   name: name,
   status: 'PENDING',
   players: {
@@ -32,66 +97,17 @@ const initialState = {
 
 export const reducer = (state = initialState, action) => {
   let gameId;
-  let game;
   switch (action.type) {
-    case CREATE_GAME:
-      game = createNewGame(action.userId, action.name);
-      return {
-        currentGameId: game.id,
-        games: {
-          ...state.games,
-          [game.id]: game
-        }
-      };
-
-    case ADD_GAMES:
-      return action.games.reduce((games, game) => {
-        games[game.id] = game;
-        return games;
-      }, state);
-
-    case REMOVE_GAMES:
-      return {
-        ...state,
-        games: objectWithout(state.games, action.gameIds)
-      };
-
-    case LEAVE_CURRENT_GAME:
-      // If there is no currentGameId, return
-      gameId = state.currentGameId;
-      if (gameId == null) {
-        return state;
-      }
-
-      const remainingPlayers = objectWithout(state.games[gameId].players, action.userId);
-
-      // If this was the last player in the game, remove the game
-      if (Object.keys(remainingPlayers).length == 0) {
-        return {
-          currentGameId: null,
-          games: objectWithout(state.games, [gameId])
-        };
-      }
-
-      // Otherwise, just remove this player
-      return {
-        currentGameId: null,
-        games: {
-          ...state.games,
-          gameId: {
-            ...state.games[gameId],
-            players: remainingPlayers
-          }
-        }
-      };
-
-    case SELECT_GAME:
-      if (!state.games[action.gameId]) {
-        return state;
-      }
+    case SET_CURRENT_GAME:
       return {
         ...state,
         currentGameId: action.gameId
+      };
+
+    case UPDATE_GAMES:
+      return {
+        ...state,
+        games: action.games
       };
 
     case ADD_PLAYERS:
@@ -118,14 +134,14 @@ export const createGame = (userId, name) => ({
   name
 });
 
-export const addGames = (games) => ({
-  type: ADD_GAMES,
-  games
+export const setCurrentGame = (gameId) => ({
+  type: SET_CURRENT_GAME,
+  gameId
 });
 
-export const removeGames = (gameIds) => ({
-  type: REMOVE_GAMES,
-  gameIds
+export const updateGames = (games) => ({
+  type: UPDATE_GAMES,
+  games
 });
 
 export const leaveCurrentGame = () => ({
@@ -137,10 +153,17 @@ export const selectGame = (gameId) => ({
   gameId
 });
 
+const watchGames = () => ({
+  type: WATCH_GAMES
+});
+
 export const gameActions = {
   createGame,
-  addGames,
-  removeGames,
+  updateGames,
   leaveCurrentGame,
-  selectGame
+  selectGame,
+  watchGames
 };
+
+
+// INTERNAL ONLY ACTION CREATORS

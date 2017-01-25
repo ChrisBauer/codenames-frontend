@@ -33,6 +33,7 @@ horizonRedux.takeLatest(
     }
   },
   (response, action, dispatch) => {
+    dispatch(setCurrentUser(null));
   },
   (err) => {
     console.err('failed to log out', err);

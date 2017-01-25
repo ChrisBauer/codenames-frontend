@@ -6,6 +6,11 @@ export const validateUser = (users, currentUserId) => {
   return currentUserId != null && users[currentUserId];
 };
 
+export const validateGame = (games, currentGameId, currentUserId) => {
+  return (currentGameId != null && currentUserId != null && games[currentGameId] &&
+      games[currentGameId].players[currentUserId]);
+};
+
 const getTeams = (players) => {
   return Object.keys(players).reduce((teams, id) => {
     if (!players[id].ready) {

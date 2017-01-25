@@ -3,7 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import { validateUser } from 'utils/validators';
+import { validateUser, validateGame } from 'utils/validators';
 
 import './Lobby.scss';
 
@@ -18,17 +18,24 @@ export default class LobbyLayout extends Component {
     router: React.PropTypes.object.isRequired
   };
 
+  componentWillMount() {
+    this.props.actions.watchGames();
+  }
+
   render() {
     console.log(this.props);
-    const { users: { users, currentUserId }, games: {games}, actions } = this.props;
+    const { users: { users, currentUserId }, games: {games, currentGameId}, actions } = this.props;
 
     if (!validateUser(users, currentUserId)) {
       this.context.router.push('/');
     }
 
+    if (validateGame(games, currentGameId, currentUserId)) {
+      this.context.router.push('/staging');
+    }
+
     const newGameHandler = (userId: number, name: string) => {
       actions.createGame(userId, name);
-      this.context.router.push('/staging');
     };
 
     const leaveLobby = () => {
@@ -38,7 +45,6 @@ export default class LobbyLayout extends Component {
 
     const goToGame = (gameId) => {
       actions.selectGame(gameId);
-      this.context.router.push('/staging');
     };
 
     /*
@@ -58,9 +64,11 @@ export default class LobbyLayout extends Component {
           <h1>Games</h1>
           <hr />
           <button onClick={() => newGameHandler(currentUserId, 'Testing')}>Create Game</button>
-          {Object.keys(games).map(id => (
-            <div key={id} className="game" onClick={() => goToGame(id)}>{games[id].name}</div>
-          ))}
+          <ul className="gameList">
+            {Object.keys(games).map(id => (
+              <li key={id} className="game" onClick={() => goToGame(id)}>{games[id].name}</li>
+            ))}
+          </ul>
         </div>
       </div>
     );
