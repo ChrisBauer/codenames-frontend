@@ -24,21 +24,21 @@
     padding:0;
     line-height: 120px;
 
-    .beige {
+    &.BROWN {
       background-color: #f5f5dc;
     }
 
-    .blue {
+    &.BLUE {
       background-color: #014c8c;
       color: #fff;
     }
 
-    .red {
+    &.RED {
       background-color: #8b0000;
       color: #fff;
     }
 
-    .black {
+    &.BLACK {
       background-color: #333;
       color: #fff;
     }

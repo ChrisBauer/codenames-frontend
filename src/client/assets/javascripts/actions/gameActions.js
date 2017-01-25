@@ -95,7 +95,6 @@ const initialState = {
 };
 
 export const reducer = (state = initialState, action) => {
-  let gameId;
   switch (action.type) {
     case SET_CURRENT_GAME:
       return {
@@ -108,11 +107,6 @@ export const reducer = (state = initialState, action) => {
         ...state,
         games: action.games
       };
-
-    case GUESS:
-    case PASS:
-    case GIVE_CLUE:
-      return delegateToGameplayReducer(state, action);
 
     default:
       return state;

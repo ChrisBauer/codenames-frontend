@@ -4,7 +4,7 @@
 
 import {wordList, CardState, CardColor} from 'models/card';
 
-import {getCurrentGameId, getGame} from 'utils/stateTraversal';
+import {getCurrentUserId, getUser, getCurrentGameId, getGame, getGamePlayerFromUser} from 'utils/stateTraversal';
 import {gameCanStart} from 'utils/validators';
 
 export const INIT_GAMEPLAY = 'codenames/actions/gameplay/initGameplay';
@@ -43,29 +43,133 @@ horizonRedux.takeLatest(
   err => console.err('error initializing gameplay', err)
 );
 
-export const delegate = (state, action) => {
-  if (!state) {
-    return getInitialState();
-  }
-  const gameId = state.currentGameId;
-  if (gameId == null) {
-    return state;
-  }
-
-  const gameAfterUpdate = reducer(state.games[gameId], action);
-
-  return {
-    ...state,
-    games: {
-      ...state.games,
-      [gameId]: gameAfterUpdate
+horizonRedux.takeLatest(
+  PASS,
+  (horizon, action, getState) => {
+    const state = getState();
+    const gameId = getCurrentGameId(state);
+    const userId = getCurrentUserId(state);
+    const game = getGame(state, gameId);
+    const player = getGamePlayerFromUser(state, gameId, userId);
+    if (!gameId || !userId || !game || !player) {
+      return;
     }
-  };
-};
+    const gameplay = game.play;
+    if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != 'GUESSER') {
+      return;
+    }
+    const move = {userId, action: ACTION_TYPES.PASS};
+    const newGameplay = {
+      nextMove: getOtherTeam(player.team),
+      nextMoveType: ACTION_TYPES.GIVE_CLUE,
+      moves: [...gameplay.moves, move]
+    };
+    return horizon('games').update({id: gameId, play: newGameplay});
+  },
+  (result, action, dispatch) => {},
+  err => console.err('error attempting to pass', err)
+);
 
-const getOtherTeam = (team) => {
-  return team == 'RED' ? 'BLUE' : 'RED';
-};
+horizonRedux.takeLatest(
+  GUESS,
+  (horizon, action, getState) => {
+    const state = getState();
+    const gameId = getCurrentGameId(state);
+    const userId = getCurrentUserId(state);
+    const game = getGame(state, gameId);
+    const player = getGamePlayerFromUser(state, gameId, userId);
+    if (!gameId || !userId || !game || !player) {
+      return;
+    }
+
+    const gameplay = game.play;
+    // Make sure it's a valid time to guess
+    if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != 'GUESSER') {
+      return;
+    }
+    // If it's already been guessed, ignore it.
+    if (action.card.status == 'GUESSED') {
+      return;
+    }
+
+    action.card.status = 'GUESSED';
+
+    const move = {userId, action: ACTION_TYPES.GUESS, card: action.card};
+
+    if (action.card.color == 'BLACK') {
+      // Assassin card
+      const newGameplay = {
+        guessesRemaining: 0,
+        clue: '',
+        nextMove: null,
+        nextMoveType: null,
+        board: gameplay.board,
+        moves: [...gameplay.moves, move]
+      };
+      return horizon('games').update({id: gameId, status: 'COMPLETE', play: newGameplay});
+    }
+    else if (action.card.color == player.team && gameplay.guessesRemaining != 1) {
+      const newGameplay = {
+        guessesRemaining: gameplay.guessesRemaining - 1,
+        board: gameplay.board,
+        moves: [...gameplay.moves, move]
+      };
+      return horizon('games').update({id: gameId, play: newGameplay});
+    }
+    // If they guessed incorrectly, or they're out of guesses, it passes to the other team.
+    else {
+      const newGameplay = {
+        guessesRemaining: 0,
+        nextMoveType: ACTION_TYPES.GIVE_CLUE,
+        nextMove: getOtherTeam(player.team),
+        clue: '',
+        board: gameplay.board,
+        moves: [...gameplay.moves, move]
+      };
+      return horizon('games').update({id: gameId, play: newGameplay});
+    }
+  },
+  (result, action, dispatch) => {},
+  err => console.err('error making guess', err)
+);
+
+horizonRedux.takeLatest(
+  GIVE_CLUE,
+  (horizon, action, getState) => {
+    const state = getState();
+    const gameId = getCurrentGameId(state);
+    const userId = getCurrentUserId(state);
+    const game = getGame(state, gameId);
+    const player = getGamePlayerFromUser(state, gameId, userId);
+    if (!gameId || !userId || !game || !player) {
+      return;
+    }
+
+    const gameplay = game.play;
+
+    if (gameplay.nextMoveType != ACTION_TYPES.GIVE_CLUE || player.team != gameplay.nextMove || player.role != 'GIVER') {
+      return;
+    }
+
+    const move = {
+      userId,
+      action: ACTION_TYPES.GIVE_CLUE,
+      clue: action.clue,
+      count: action.count
+    };
+    const newGameplay = {
+      guessesRemaining: action.count != 0 ? action.count + 1 : -1,
+      clue: action.clue,
+      moves: [...gameplay.moves, move],
+      nextMoveType: ACTION_TYPES.GUESS
+    };
+    return horizon('games').update({id: gameId, play: newGameplay});
+  },
+  (result, action, dispatch) => {},
+  err => console.err('error giving clue', err)
+);
+
+const getOtherTeam = team => team == 'RED' ? 'BLUE' : 'RED';
 
 const generateBoard = (firstTeam = 'RED') => {
 
@@ -83,7 +187,7 @@ const generateBoard = (firstTeam = 'RED') => {
   let i;
   for (i = 0; i < 25; i++) {
     const nextWord = getNextWord(alreadyUsed, wordList);
-    const newCard = {word: nextWord, state: CardState.FRESH, key: alreadyUsed[alreadyUsed.length - 1]};
+    const newCard = {word: nextWord, status: CardState.FRESH, key: alreadyUsed[alreadyUsed.length - 1]};
     if (i < 8) {
       newCard.color = 'RED';
     }
@@ -120,117 +224,6 @@ const getInitialState = () => {
     guessesRemaining: 0,
     clue: '',
     moves: []
-  }
-};
-
-const getPlayerFromUserId = (game, userId) => game.players[userId];
-
-export const reducer = (state = getInitialState(), action) => {
-  const player = getPlayerFromUserId(state, action.userId);
-  let move;
-  switch(action.type) {
-    case PASS:
-      // Make sure it's a valid time to pass
-      if (state.nextMoveType != ACTION_TYPES.GUESS || player.team != state.nextMove) {
-        return state;
-      }
-      move = {player, action: ACTION_TYPES.PASS};
-      return {
-        ...state,
-        play: {
-          ...state.play,
-          moves: [...state.play.moves, move],
-          nextMove: getOtherTeam(player.team),
-          nextMoveType: ACTION_TYPES.GIVE_CLUE
-        }
-      };
-    case GUESS:
-      // Make sure it's a valid time to guess
-      if (state.nextMoveType != ACTION_TYPES.GUESS || player.team != state.nextMove) {
-        return state;
-      }
-      // If it's already been guessed, ignore it.
-      if (state.board[action.cardIndex].status == 'GUESSED') {
-        return state;
-      }
-      move = {player, action: ACTION_TYPES.GUESS, card: state.board[action.cardIndex]};
-      const card = Object.assign({}, state.board[action.cardIndex]);
-      card.revealed = true;
-      if (card.color == 'BLACK') {
-        // Assassin card
-        return {
-          ...state,
-          status: 'COMPLETE',
-          play: {
-            ...state.play,
-            board: [
-              ...state.board.slice(0, action.cardIndex),
-              card,
-              ...state.board.slice(action.cardIndex + 1)
-            ],
-            moves: [...state.play.moves, move],
-            nextTurn: getOtherTeam(player.team)
-          }
-        }
-      }
-      else if (state.play.guessesRemaining > 1) {
-        return {
-          ...state,
-          play: {
-            ...state.play,
-            guessesRemaining: state.play.guessesRemaining - 1,
-            board: [
-              ...state.board.slice(0, action.cardIndex),
-              card,
-              ...state.board.slice(action.cardIndex + 1)
-            ],
-            moves: [...state.play.moves, move],
-            nextTurn: player.team
-          }
-        }
-      }
-      // It wasn't a black card and this team is out of guesses
-      else {
-        return {
-          ...state,
-          play: {
-            ...state.play,
-            guessesRemaining: 0,
-            board: [
-              ...state.board.slice(0, action.cardIndex),
-              card,
-              ...state.board.slice(action.cardIndex + 1)
-            ],
-            moves: [...state.play.moves, move],
-            nextMoveType: ACTION_TYPES.GIVE_CLUE,
-            clue: '',
-            nextTurn: getOtherTeam(player.team)
-          }
-        }
-      }
-
-    case GIVE_CLUE:
-      if (state.play.nextMoveType != ACTION_TYPES.GIVE_CLUE || player.team != state.play.nextMove) {
-        return state;
-      }
-      return {
-        ...state,
-        play: {
-          ...state.play,
-          guessesRemaining: action.count,
-          clue: action.clue,
-          moves: [...state.play.moves, {action: ACTION_TYPES.GIVE_CLUE, clue: action.clue, count: action.count}],
-          nextMoveType: ACTION_TYPES.GUESS
-        }
-      };
-
-
-    case SUGGEST_TO_TEAM:
-      // TODO: Implement?
-      return state;
-
-    default:
-      return state;
   }
 };
 
