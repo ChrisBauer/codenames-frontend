@@ -4,16 +4,44 @@
 
 import {wordList, CardState, CardColor} from 'models/card';
 
+import {getCurrentGameId, getGame} from 'utils/stateTraversal';
+import {gameCanStart} from 'utils/validators';
+
+export const INIT_GAMEPLAY = 'codenames/actions/gameplay/initGameplay';
 export const GUESS = 'codenames/actions/gameplay/guess';
 export const PASS = 'codenames/actions/gameplay/pass';
 export const GIVE_CLUE = 'codenames/actions/gameplay/giveClue';
 export const SUGGEST_TO_TEAM = 'codenames/actions/gameplay/suggestToTeam';
+import horizonRedux from 'app/horizon/redux';
 
 export const ACTION_TYPES = {
   GUESS: 'Guess',
   GIVE_CLUE: 'Give Clue',
   PASS: 'Pass'
 };
+
+horizonRedux.takeLatest(
+  INIT_GAMEPLAY,
+  (horizon, action, getState) => {
+    const state = getState();
+    const currentGameId = getCurrentGameId(state);
+    if (currentGameId != action.gameId) {
+      return;
+    }
+
+    const game = getGame(state, action.gameId);
+    if (!gameCanStart(game.players)) {
+      return;
+    }
+
+    game.play = getInitialState();
+    game.status = 'IN_PROGRESS';
+
+    return horizon('games').replace(game);
+  },
+  (result, action, dispatch) => {},
+  err => console.err('error initializing gameplay', err)
+);
 
 export const delegate = (state, action) => {
   if (!state) {
@@ -206,6 +234,11 @@ export const reducer = (state = getInitialState(), action) => {
   }
 };
 
+export const initGameplay = (gameId) => ({
+  type: INIT_GAMEPLAY,
+  gameId
+});
+
 export const pass = (userId) => ({
   type: PASS,
   userId
@@ -225,6 +258,7 @@ export const giveClue = (userId, clue, count) => ({
 });
 
 export const gameplayActions = {
+  initGameplay,
   pass,
   guess,
   giveClue

@@ -3,11 +3,13 @@
  */
 
 import {objectWithout} from 'utils/utils';
-import {gameCanStart} from 'utils/validators';
-import {delegate as gameplayDelegate} from './gameplayActions';
+import horizonRedux from 'app/horizon/redux';
 
-export const ADD_PLAYERS = 'codenames/actions/players/addPlayers';
-export const REMOVE_PLAYERS = 'codenames/actions/players/removePlayers';
+import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame,
+  getGamePlayerFromUser, getPlayersWithoutUser, getPlayersPlusPlayer} from 'utils/stateTraversal';
+
+import {delegate as gameplayDelegate, initGameplay} from './gameplayActions';
+
 export const CHANGE_TEAM = 'codenames/actions/players/changeTeam';
 export const CHANGE_ROLE = 'codenames/actions/players/changeRole';
 export const SET_READY = 'codenames/actions/players/setReady';
@@ -19,92 +21,80 @@ export const createPlayerFromUser = (userId) => ({
   ready: false
 });
 
+const getOtherTeam = (team) => team == 'RED' ? 'BLUE' : 'RED';
+const getOtherRole = (role) => role == 'GIVER' ? 'GUESSER' : 'GIVER';
+
 const resetReady = (players) => {
   const resetPlayers = Object.assign({}, players);
   Object.keys(resetPlayers).forEach(id => resetPlayers[id].ready = false);
   return resetPlayers;
 };
 
-export const delegate = (state, action) => {
-  const gameId = state.currentGameId;
-  if (gameId == null) {
-    return state;
-  }
-  const game = Object.assign({}, state.games[gameId]);
-  action.player = game.players[action.userId];
-  game.players = reducer(game.players, action);
-
-  if (action.type == SET_READY && gameCanStart(game.players)) {
-    game.play = gameplayDelegate();
-    game.status = 'IN_PROGRESS';
-  }
-
-  return {
-    ...state,
-    games: {
-      ...state.games,
-      [gameId]: game
+horizonRedux.takeLatest(
+  CHANGE_TEAM,
+  (horizon, action, getState) => {
+    const state = getState();
+    const userId = getCurrentUserId(state);
+    const gameId = getCurrentGameId(state);
+    if (!userId || !gameId) {
+      return;
     }
-  };
-};
 
-export const reducer = (state = {}, action) => {
-  const originalState = Object.assign({}, state);
-  let stateCopy;
-  switch (action.type) {
-    case ADD_PLAYERS:
-      stateCopy = resetReady(state);
-      const newUsers = action.userIds.reduce((players, id) => {
-        players[id] = createPlayerFromUser(id);
-        return players;
-      }, {});
-      return {
-        ...stateCopy,
-        ...newUsers
-      };
-    case REMOVE_PLAYERS:
-      stateCopy = resetReady(state);
-      return objectWithout(stateCopy, action.userIds);
-    case CHANGE_TEAM:
-      stateCopy = resetReady(state);
-      return {
-        ...stateCopy,
-        [action.userId]: {
-          ...stateCopy[action.userId],
-          team: stateCopy[action.userId].team == 'RED' ? 'BLUE' : 'RED'
-        }
-      };
-    case CHANGE_ROLE:
-      stateCopy = resetReady(state);
-      return {
-        ...stateCopy,
-        [action.userId]: {
-          ...stateCopy[action.userId],
-          role: stateCopy[action.userId].role == 'GUESSER' ? 'GIVER' : 'GUESSER'
-        }
-      };
-    case SET_READY:
-      return {
-        ...originalState,
-        [action.userId]: {
-          ...originalState[action.userId],
-          ready: true
-        }
-      };
-    default:
-      return originalState;
-  }
-};
+    const players = resetReady(getGame(state, gameId).players);
 
-export const addPlayers = (userIds) => ({
-  type: ADD_PLAYERS,
-  userIds
-});
+    if (!players[userId]) {
+      return;
+    }
+    const player = players[userId];
+    player.team = getOtherTeam(player.team);
+    return horizon('games').update({id: gameId, players: {...players}});
+  },
+  (result, action, dispatch) => {},
+  err => console.err('failed to change team', err)
+);
 
-export const removePlayers = (userIds) => ({
-  type: REMOVE_PLAYERS,
-  userIds
-});
+horizonRedux.takeLatest(
+  CHANGE_ROLE,
+  (horizon, action, getState) => {
+    const state = getState();
+    const userId = getCurrentUserId(state);
+    const gameId = getCurrentGameId(state);
+    if (!userId || !gameId) {
+      return;
+    }
+
+    const players = resetReady(getGame(state, gameId).players);
+
+    if (!players[userId]) {
+      return;
+    }
+    const player = players[userId];
+    player.role = getOtherRole(player.role);
+    return horizon('games').update({id: gameId, players: {...players}});
+  },
+  (result, action, dispatch) => {},
+  err => console.err('failed to change role', err)
+);
+
+horizonRedux.takeLatest(
+  SET_READY,
+  (horizon, action, getState) => {
+    const state = getState();
+    const userId = getCurrentUserId(state);
+    const gameId = getCurrentGameId(state);
+    if (!userId || !gameId) {
+      return;
+    }
+
+    const player = getGamePlayerFromUser(state, gameId, userId);
+    player.ready = true;
+    return horizon('games').update({id: gameId, players: {[userId]: player}});
+  },
+  (result, action, dispatch) => {
+    dispatch(initGameplay(result.id));
+  },
+  err => console.err('failed to change team', err)
+);
 
 export const changeTeam = (userId) => ({
   type: CHANGE_TEAM,
@@ -122,8 +112,6 @@ export const setReady = (userId) => ({
 });
 
 export const playerActions = {
-  addPlayers,
-  removePlayers,
   changeTeam,
   changeRole,
   setReady

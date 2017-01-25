@@ -80,6 +80,7 @@ export default class StagingLayout extends Component {
       actions.setReady(currentUserId);
     };
 
+    // TODO: make person component, switcher component to avoid duplication
 
     return (
       <div className="staging">
@@ -94,7 +95,7 @@ export default class StagingLayout extends Component {
               return (
                 <div key={userId} className="player">
                   <div className={person.player.ready ? 'is-ready': ''}/>
-                  <h2>{person.user.username}</h2>
+                  <h2 className={person.player.role}>{person.user.username}</h2>
                   <button className="change-team" onClick={changeTeam}>T</button>
                   <button className="change-role" onClick={changeRole}>R</button>
                   <button className="set-ready" onClick={setReady}>✓</button>
@@ -104,7 +105,7 @@ export default class StagingLayout extends Component {
             return (
               <div key={userId} className="player">
                 <div className={person.player.ready ? 'is-ready': ''}/>
-                <h2>{person.user.username}</h2>
+                <h2 className={person.player.role}>{person.user.username}</h2>
               </div>
             )
           })}
@@ -118,7 +119,7 @@ export default class StagingLayout extends Component {
               return (
                 <div key={userId} className="player">
                   <div className={person.player.ready ? 'is-ready': ''}/>
-                  <h2>{person.user.username}</h2>
+                  <h2 className={person.player.role}>{person.user.username}</h2>
                   <button className="change-team" onClick={changeTeam}>T</button>
                   <button className="change-role" onClick={changeRole}>R</button>
                   <button className="set-ready" onClick={setReady}>✓</button>
@@ -128,7 +129,7 @@ export default class StagingLayout extends Component {
             return (
               <div key={userId} className="player">
                 <div className={person.player.ready ? 'is-ready': ''}/>
-                <h2>{person.user.username}</h2>
+                <h2 className={person.player.role}>{person.user.username}</h2>
               </div>
             )
           })}

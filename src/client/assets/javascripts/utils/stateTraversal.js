@@ -3,21 +3,21 @@
  */
 
 export const getCurrentUserId = state => state.users.currentUserId;
-export const getUsers = state => state.users.users;
+export const getUsers = state => Object.assign({}, state.users.users);
 
 export const getUser = (state, userId) => {
   if (getUsers(state) && getUsers(state)[userId]) {
-    return getUsers(state)[userId];
+    return Object.assign({}, getUsers(state)[userId]);
   }
   return null;
 };
 
 export const getCurrentGameId = state => state.games.currentGameId;
-export const getGames = state => state.games.games;
+export const getGames = state => Object.assign({}, state.games.games);
 
 export const getGame = (state, gameId) => {
   if (getGames(state) && getGames(state)[gameId]) {
-    return getGames(state)[gameId];
+    return Object.assign({}, getGames(state)[gameId]);
   }
   return null;
 };
@@ -25,7 +25,10 @@ export const getGame = (state, gameId) => {
 export const getGamePlayerFromUser = (state, gameId, userId) => {
   if (getGame(state, gameId) && getUser(state, userId)) {
     const game = getGame(state, gameId);
-    return game.players[userId] || null;
+    if (game.players[userId]) {
+      return Object.assign({}, game.players[userId]);
+    }
+    return null;
   }
 };
 

@@ -34,6 +34,8 @@ export default class LobbyLayout extends Component {
       this.context.router.push('/staging');
     }
 
+    const pendingGames = Object.keys(games).map(id => games[id]).filter(game => game.status == 'PENDING');
+
     const newGameHandler = (userId: number, name: string) => {
       actions.createGame(userId, name);
     };
@@ -65,8 +67,8 @@ export default class LobbyLayout extends Component {
           <hr />
           <button onClick={() => newGameHandler(currentUserId, 'Testing')}>Create Game</button>
           <ul className="gameList">
-            {Object.keys(games).map(id => (
-              <li key={id} className="game" onClick={() => goToGame(id)}>{games[id].name}</li>
+            {pendingGames.map(game => (
+              <li key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</li>
             ))}
           </ul>
         </div>

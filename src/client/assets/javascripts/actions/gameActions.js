@@ -2,7 +2,6 @@
  * Created by chris on 1/7/17.
  */
 
-import objectWithout from 'utils/utils';
 import horizonRedux from 'app/horizon/redux';
 import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame, getPlayersWithoutUser, getPlayersPlusPlayer} from 'utils/stateTraversal';
 
@@ -14,7 +13,7 @@ const SET_CURRENT_GAME = 'codenames/actions/game/setCurrentGame';
 
 const WATCH_GAMES = 'codenames/actions/game/watchGames';
 
-import { ADD_PLAYERS, REMOVE_PLAYERS, CHANGE_TEAM, CHANGE_ROLE, SET_READY, delegate as delegateToPlayersReducer, createPlayerFromUser } from 'actions/playerActions';
+import { createPlayerFromUser } from 'actions/playerActions';
 import { PASS, GUESS, GIVE_CLUE, delegate as delegateToGameplayReducer } from 'actions/gameplayActions';
 
 horizonRedux.takeLatest(
@@ -30,7 +29,7 @@ horizonRedux.takeLatest(
 horizonRedux.takeLatest(
   WATCH_GAMES,
   (horizon, action) =>
-    horizon('games').findAll({status: 'PENDING'}).order('name').limit(100).watch(),
+    horizon('games').order('name').limit(100).watch(),
   (result, action, dispatch) => {
     const games = result.reduce((acc, game) => {acc[game.id] = game; return acc;}, {});
     dispatch(updateGames(games));
@@ -109,14 +108,6 @@ export const reducer = (state = initialState, action) => {
         ...state,
         games: action.games
       };
-
-    case ADD_PLAYERS:
-    case REMOVE_PLAYERS:
-    case CHANGE_TEAM:
-    case CHANGE_ROLE:
-    case SET_READY:
-      return delegateToPlayersReducer(state, action);
-
 
     case GUESS:
     case PASS:
