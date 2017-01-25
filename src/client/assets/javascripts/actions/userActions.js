@@ -26,8 +26,12 @@ horizonRedux.takeLatest(
 
 horizonRedux.takeLatest(
   LOGOUT_CURRENT_USER,
-  (horizon, action) =>
-    horizon('activeUsers').remove({id: action.id}),
+  (horizon, action, getState) => {
+    const currentUserId = getState().users.currentUserId;
+    if (currentUserId) {
+      horizon('activeUsers').remove({id: currentUserId});
+    }
+  },
   (response, action, dispatch) => {
   },
   (err) => {
@@ -40,7 +44,8 @@ horizonRedux.takeLatest(
   (horizon, action) =>
     horizon('activeUsers').order('username').limit(100).watch(),
   (result, action, dispatch) => {
-    dispatch(updateUsers(result));
+    const users = result.reduce((acc, user) => {acc[user.id] = user; return acc;}, {});
+    dispatch(updateUsers(users));
   },
   (err) => {
     console.err('failed to load users', err);
@@ -62,7 +67,7 @@ export const reducer = (state = initialState, action) => {
     case UPDATE_USERS:
       return {
         ...state,
-        users: action.users.reduce((acc, user) => {acc[user.id] = user; return acc;}, {})
+        users: action.users
       };
 
     default:
@@ -74,9 +79,8 @@ export const loginUser = (username) => ({
   username
 });
 
-export const logoutCurrentUser = (id) => ({
-  type: LOGOUT_CURRENT_USER,
-  id
+export const logoutCurrentUser = () => ({
+  type: LOGOUT_CURRENT_USER
 });
 
 export const setCurrentUser = (id) => ({

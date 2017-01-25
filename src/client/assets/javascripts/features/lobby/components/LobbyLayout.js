@@ -32,7 +32,7 @@ export default class LobbyLayout extends Component {
     };
 
     const leaveLobby = () => {
-      actions.logoutCurrentUser(currentUserId);
+      actions.logoutCurrentUser();
       this.context.router.push('/');
     };
 
