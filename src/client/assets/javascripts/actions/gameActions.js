@@ -5,6 +5,7 @@
 import horizonRedux from 'app/horizon/redux';
 import {Observable} from 'rxjs';
 import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame, getPlayersWithoutUser, getPlayersPlusPlayer} from 'utils/stateTraversal';
+import {gameCanStart} from 'utils/validators';
 
 const CREATE_GAME = 'codenames/actions/game/createGame';
 const UPDATE_GAMES = 'codenames/actions/game/updateGames';
@@ -56,9 +57,15 @@ horizonRedux.takeLatest(
       return horizon('games').remove({id: gameId});
     }
 
-    // Note that we can't remove one key from a nested field, so we have to replace the whol
-    // object with out the player
+    // Note that we can't remove one key from a nested field, so we have to replace the whole
+    // object without the player
     const game = getGame(state, gameId);
+
+    // If the leaving player means that the game can no longer exist, set the game to error state
+    if (game.status == 'IN_PROGRESS' && !gameCanStart(newPlayers)) {
+      game.status = 'ERROR';
+      return horizon('games').replace(game);
+    }
     game.players = newPlayers;
     return horizon('games').replace(game);
   },
