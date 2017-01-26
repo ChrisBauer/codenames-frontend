@@ -2,26 +2,12 @@
  * Created by chris on 1/3/17.
  */
 
-export type User = {
-  id: number,
-  username: string,
-};
+import {Teams} from 'models/game';
 
-export type Team =
- | "RED" | "BLUE";
-
-export type Role =
- | "GIVER" | "GUESSER";
-
-export function createPlayerFromUser (user: User) {
+export function createPlayerFromUser (user) {
   return {
     user: user,
-    team: "RED",
+    team: Teams.RED,
     role: "GIVER"
   }
 }
-export type Player = {
-  user: User,
-  team: Team,
-  role: Role
-};

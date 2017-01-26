@@ -7,6 +7,8 @@ import {Observable} from 'rxjs';
 
 import {getCurrentUserId, getUser, getCurrentGameId, getGame, getGamePlayerFromUser} from 'utils/stateTraversal';
 import {gameCanStart, checkForVictory} from 'utils/validators';
+import {cardColor} from 'models/card';
+import {Teams} from 'models/game';
 
 export const INIT_GAMEPLAY = 'codenames/actions/gameplay/initGameplay';
 export const CHECK_VICTORY = 'codenames/actions/gameplay/checkVictory';
@@ -98,7 +100,7 @@ horizonRedux.takeLatest(
 
     const move = {userId, action: ACTION_TYPES.GUESS, card: action.card};
 
-    if (action.card.color == 'BLACK') {
+    if (action.card.color == cardColor.BLACK) {
       // Assassin card
       const newGameplay = {
         guessesRemaining: 0,
@@ -199,9 +201,9 @@ horizonRedux.takeLatest(
   err => console.err('error checking victory')
 );
 
-const getOtherTeam = team => team == 'RED' ? 'BLUE' : 'RED';
+const getOtherTeam = team => team == Teams.RED ? Teams.BLUE : Teams.RED;
 
-const generateBoard = (firstTeam = 'RED') => {
+const generateBoard = (firstTeam = Teams.RED) => {
 
   const getNextWord = (alreadyUsed, wordList) => {
     let nextIndex = Math.random() * wordList.length | 0;
@@ -219,16 +221,16 @@ const generateBoard = (firstTeam = 'RED') => {
     const nextWord = getNextWord(alreadyUsed, wordList);
     const newCard = {word: nextWord, status: CardState.FRESH, key: alreadyUsed[alreadyUsed.length - 1]};
     if (i < 8) {
-      newCard.color = 'RED';
+      newCard.color = CardColor.RED;
     }
     else if (i < 16) {
-      newCard.color = 'BLUE';
+      newCard.color = CardColor.BLUE;
     }
     else if (i < 23) {
-      newCard.color = 'BROWN';
+      newCard.color = CardColor.BROWN;
     }
     else if (i == 23) {
-      newCard.color = 'BLACK';
+      newCard.color = CardColor.BLACK;
     }
     else {
       newCard.color = firstTeam;
@@ -246,10 +248,10 @@ const generateBoard = (firstTeam = 'RED') => {
 
 const getInitialState = () => {
   const board = generateBoard();
-  const redFirst = board.filter(card => card.color == 'RED').length == 9;
+  const redFirst = board.filter(card => card.color == CardColor.RED).length == 9;
   return {
     board: board,
-    nextMove: redFirst ? 'RED' : 'BLUE',
+    nextMove: redFirst ? Teams.RED : Teams.BLUE,
     nextMoveType: ACTION_TYPES.GIVE_CLUE,
     guessesRemaining: 0,
     clue: '',

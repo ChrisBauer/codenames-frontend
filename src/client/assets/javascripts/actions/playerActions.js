@@ -6,6 +6,9 @@ import {objectWithout} from 'utils/utils';
 import {Observable} from 'rxjs';
 import horizonRedux from 'app/horizon/redux';
 
+import {CardColor} from 'models/card';
+import {Teams} from 'models/game';
+
 import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame,
   getGamePlayerFromUser, getPlayersWithoutUser, getPlayersPlusPlayer} from 'utils/stateTraversal';
 
@@ -17,12 +20,12 @@ export const SET_READY = 'codenames/actions/players/setReady';
 
 export const createPlayerFromUser = (userId) => ({
   userId,
-  team: 'RED',
+  team: Teams.RED,
   role: 'GUESSER',
   ready: false
 });
 
-const getOtherTeam = (team) => team == 'RED' ? 'BLUE' : 'RED';
+const getOtherTeam = (team) => team == Teams.RED ? Teams.BLUE : Teams.RED;
 const getOtherRole = (role) => role == 'GIVER' ? 'GUESSER' : 'GIVER';
 
 const resetReady = (players) => {

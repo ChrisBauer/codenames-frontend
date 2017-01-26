@@ -2,6 +2,8 @@
  * Created by chris on 1/8/17.
  */
 
+import {CardColor} from 'models/card';
+
 export const validateUser = (users, currentUserId) => {
   return currentUserId != null && users[currentUserId];
 };
@@ -13,8 +15,8 @@ export const validateGameForStaging = (games, currentGameId, currentUserId) => {
 };
 
 export const checkForVictory = (board) => {
-  const redVictory = board.filter(card => card.color == 'RED').every(card => card.status == 'GUESSED');
-  const blueVictory = board.filter(card => card.color == 'BLUE').every(card => card.status == 'GUESSED');
+  const redVictory = board.filter(card => card.color == CardColor.RED).every(card => card.status == 'GUESSED');
+  const blueVictory = board.filter(card => card.color == CardColor.BLUE).every(card => card.status == 'GUESSED');
 
   if (redVictory && blueVictory) {
     throw new Error('Both teams match victory condition - how can this be?!');
@@ -24,7 +26,7 @@ export const checkForVictory = (board) => {
   }
 
   // At this point we know that one is true and one is false.
-  return redVictory ? 'RED' : 'BLUE';
+  return redVictory ? CardColor.RED : CardColor.BLUE;
 };
 
 const getTeams = (players) => {
@@ -34,7 +36,7 @@ const getTeams = (players) => {
     }
     teams[players[id].team][id] = players[id];
     return teams;
-  }, {RED: {}, BLUE: {}});
+  }, {red: {}, blue: {}});
 };
 
 export const gameCanStart = (players) => {
@@ -47,21 +49,21 @@ export const gameCanStart = (players) => {
     return false;
   }
   // Need at least 4 players
-  if (Object.keys(teams.RED).length + Object.keys(teams.BLUE).length < 4) {
+  if (Object.keys(teams.red).length + Object.keys(teams.blue).length < 4) {
     return false;
   }
   // Need at least 2 on each team
-  if (Object.keys(teams.RED).length < 2) {
+  if (Object.keys(teams.red).length < 2) {
     return false;
   }
-  if (Object.keys(teams.BLUE).length < 2) {
+  if (Object.keys(teams.blue).length < 2) {
     return false;
   }
   // Need one and only one GIVER per team.
-  if (Object.keys(teams.RED).filter(id => teams.RED[id].role == 'GIVER').length != 1) {
+  if (Object.keys(teams.red).filter(id => teams.red[id].role == 'GIVER').length != 1) {
     return false;
   }
-  if (Object.keys(teams.BLUE).filter(id => teams.BLUE[id].role == 'GIVER').length != 1) {
+  if (Object.keys(teams.blue).filter(id => teams.blue[id].role == 'GIVER').length != 1) {
     return false;
   }
 

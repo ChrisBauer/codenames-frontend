@@ -15,11 +15,11 @@
   text-align: center;
   line-height: 100px;
 
-  &.BLUE {
+  &.blue {
     background-color: #014c8c;
   }
 
-  &.RED {
+  &.red {
     background-color: #8b0000;
   }
 
@@ -44,10 +44,10 @@
     text-transform: capitalize;
   }
 
-  &.BLUE {
+  &.blue {
     color: #014c8c;
   }
-  &.RED {
+  &.red {
     color: #8b0000;
   }
 }
@@ -85,14 +85,14 @@
     line-height: 80px;
 
 
-    &.BROWN {
+    &.brown {
       color: #ccaf91;
       &.guessed {
         background-color: #ccaf91;
       }
     }
 
-    &.BLUE {
+    &.blue {
       color: #014c8c;
       &.guessed {
         background-color: #014c8c;
@@ -100,7 +100,7 @@
       }
     }
 
-    &.RED {
+    &.red {
       color: #8b0000;
       &.guessed {
         background-color: #8b0000;
@@ -108,7 +108,7 @@
       }
     }
 
-    &.BLACK {
+    &.black {
       color: #333;
       &.guessed {
         background-color: #333;
@@ -131,10 +131,10 @@
   font-size: initial;
   text-align: center;
 
-  p.RED {
+  p.red {
     color: #8b0000;
   }
-  p.BLUE {
+  p.blue {
     color: #014c8c;
   }
   .team {

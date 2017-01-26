@@ -16,6 +16,11 @@ export type GameInfo = {
   status: GameStatus
 };
 
+export const teams = {
+  RED: 'red',
+  BLUE: 'blue'
+};
+
 export type Board = {
   board: [Card]   // cards laid out as a list:
                   // 0 1 2 3 4

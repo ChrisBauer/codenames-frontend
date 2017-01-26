@@ -34,7 +34,7 @@ export default class StagingLayout extends Component {
       const team = nextPerson.player.team;
       teams[team][userId] = nextPerson;
       return teams;
-    }, {RED: {}, BLUE: {}});
+    }, {red: {}, blue: {}});
   }
 
   validateProps (props) {
@@ -93,16 +93,16 @@ export default class StagingLayout extends Component {
           <div className="red">
             <h1>Red Team</h1>
             <hr />
-            {Object.keys(teams.RED).map(userId => {
-              const person = teams.RED[userId];
+            {Object.keys(teams.red).map(userId => {
+              const person = teams.red[userId];
               return <PlayerCard key={userId} actions={actions} person={person} currentUserId={currentUserId}/>;
             })}
           </div>
           <div className="blue">
             <h1>Blue Team</h1>
             <hr />
-            {Object.keys(teams.BLUE).map(userId => {
-              const person = teams.BLUE[userId];
+            {Object.keys(teams.blue).map(userId => {
+              const person = teams.blue[userId];
               return <PlayerCard key={userId} actions={actions} person={person} currentUserId={currentUserId}/>;
             })}
           </div>

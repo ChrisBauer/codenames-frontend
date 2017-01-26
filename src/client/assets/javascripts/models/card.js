@@ -3,13 +3,17 @@
  */
 
 export const CardState = {
-  FRESH: "FRESH",
-  GUESSED: "GUESSED",
-  SUGGESTED: "SUGGESTED"
+  FRESH: "fresh",
+  GUESSED: "guessed",
+  SUGGESTED: "suggested"
 };
 
-export type CardColor =
- | "RED" | "BLUE" | "BROWN" | "BLACK";
+export type CardColor = {
+  RED: 'red',
+  BLUE: 'blue',
+  BROWN: 'brown',
+  BLACK: 'black'
+}
 
 export type Card = {
   word: string,
