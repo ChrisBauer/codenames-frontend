@@ -111,8 +111,11 @@ export default class GameLayout extends Component {
           <div className="board">
             {gameplay.board.map(card => {
               let classes = 'card';
-              if (card.status == 'GUESSED') {
+              if (card.status == 'GUESSED' || thisPerson.player.role == 'GIVER') {
                 classes += ` ${card.color}`;
+              }
+              if (card.status == 'GUESSED') {
+                classes += ' guessed';
               }
               return (
                 <div key={card.key} className={classes} onClick={() => cardAction(card)}>{card.word}</div>
