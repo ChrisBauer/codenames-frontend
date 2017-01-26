@@ -4,6 +4,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { validateUser, validateGameForStaging } from 'utils/validators';
+import {GameStatus} from 'models/game';
 
 import './Lobby.scss';
 
@@ -44,7 +45,7 @@ export default class LobbyLayout extends Component {
 
     const { users: { users, currentUserId }, games: {games}, actions } = this.props;
 
-    const pendingGames = Object.keys(games).map(id => games[id]).filter(game => game.status == 'PENDING');
+    const pendingGames = Object.keys(games).map(id => games[id]).filter(game => game.status == GameStatus.PENDING);
 
     const newGameHandler = (userId: number, name: string) => {
       actions.createGame(userId, name);

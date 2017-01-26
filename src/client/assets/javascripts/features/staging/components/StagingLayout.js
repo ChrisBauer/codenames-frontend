@@ -4,6 +4,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
+import {GameStatus} from 'models/game';
 import PlayerCard from './PlayerCard';
 
 import './Staging.scss';
@@ -54,7 +55,7 @@ export default class StagingLayout extends Component {
     }
 
     const game = games[currentGameId];
-    if (game.status == 'IN_PROGRESS' && game.players[thisPerson.id]) {
+    if (game.status == GameStatus.IN_PROGRESS && game.players[thisPerson.id]) {
       this.context.router.push('/game');
       return false;
     }

@@ -3,7 +3,7 @@
  */
 
 import {CardColor, CardState} from 'models/card';
-import {Roles} from 'models/game';
+import {Roles, GameStatus} from 'models/game';
 
 export const validateUser = (users, currentUserId) => {
   return currentUserId != null && users[currentUserId];
@@ -11,7 +11,7 @@ export const validateUser = (users, currentUserId) => {
 
 export const validateGameForStaging = (games, currentGameId, currentUserId) => {
   return (currentGameId != null && currentUserId != null && games[currentGameId] &&
-      games[currentGameId].status == 'PENDING' &&
+      games[currentGameId].status == GameStatus.PENDING &&
       games[currentGameId].players[currentUserId]);
 };
 

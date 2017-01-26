@@ -2,13 +2,12 @@
  * Created by chris on 1/9/17.
  */
 
-import {wordList, CardState, CardColor} from 'models/card';
 import {Observable} from 'rxjs';
 
 import {getCurrentUserId, getUser, getCurrentGameId, getGame, getGamePlayerFromUser} from 'utils/stateTraversal';
 import {gameCanStart, checkForVictory} from 'utils/validators';
-import {CardColor, CardState} from 'models/card';
-import {Teams, Roles} from 'models/game';
+import {wordList, CardColor, CardState} from 'models/card';
+import {Teams, Roles, GameStatus} from 'models/game';
 
 export const INIT_GAMEPLAY = 'codenames/actions/gameplay/initGameplay';
 export const CHECK_VICTORY = 'codenames/actions/gameplay/checkVictory';
@@ -39,7 +38,7 @@ horizonRedux.takeLatest(
     }
 
     game.play = getInitialState();
-    game.status = 'IN_PROGRESS';
+    game.status = GameStatus.IN_PROGRESS;
 
     return horizon('games').replace(game);
   },
@@ -110,7 +109,7 @@ horizonRedux.takeLatest(
         board: gameplay.board,
         moves: [...gameplay.moves, move],
       };
-      return horizon('games').update({id: gameId, status: 'COMPLETE', victor: getOtherTeam(player.team), play: newGameplay});
+      return horizon('games').update({id: gameId, status: GameStatus.COMPLETED, victor: getOtherTeam(player.team), play: newGameplay});
     }
     else if (action.card.color == player.team && gameplay.guessesRemaining != 1) {
       const newGameplay = {
@@ -195,7 +194,7 @@ horizonRedux.takeLatest(
       clue: '',
       guessesRemaining: 0
     };
-    return horizon('games').update({id: gameId, status: 'COMPLETE', play, victor});
+    return horizon('games').update({id: gameId, status: GameStatus.COMPLETED, play, victor});
   },
   (result, action, dispatch) => {},
   err => console.err('error checking victory')

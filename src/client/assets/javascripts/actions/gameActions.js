@@ -4,6 +4,7 @@
 
 import horizonRedux from 'app/horizon/redux';
 import {Observable} from 'rxjs';
+import {GameStatus} from 'models/game';
 import {getCurrentUserId, getUsers, getCurrentGameId, getGames, getGame, getPlayersWithoutUser, getPlayersPlusPlayer} from 'utils/stateTraversal';
 import {gameCanStart} from 'utils/validators';
 
@@ -62,8 +63,8 @@ horizonRedux.takeLatest(
     const game = getGame(state, gameId);
 
     // If the leaving player means that the game can no longer exist, set the game to error state
-    if (game.status == 'IN_PROGRESS' && !gameCanStart(newPlayers)) {
-      game.status = 'ERROR';
+    if (game.status == GameStatus.IN_PROGRESS && !gameCanStart(newPlayers)) {
+      game.status = GameStatus.ERROR;
       game.players = {};
       return horizon('games').replace(game);
     }
@@ -93,7 +94,7 @@ horizonRedux.takeLatest(
 
 const createNewGame = (userId, name) => ({
   name: name,
-  status: 'PENDING',
+  status: GameStatus.PENDING,
   players: {
     [userId]: createPlayerFromUser(userId)
   },

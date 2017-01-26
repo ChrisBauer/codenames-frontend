@@ -4,7 +4,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import {Roles} from 'models/game';
+import {Roles, GameStatus} from 'models/game';
 import {CardState} from 'models/card';
 import {ACTION_TYPES} from 'actions/gameplayActions';
 import Sidebar from './sidebar';
@@ -42,7 +42,7 @@ export default class GameLayout extends Component {
     }
 
     const game = games[currentGameId];
-    if (game.status != 'IN_PROGRESS' && game.status != 'COMPLETE') {
+    if (game.status != GameStatus.IN_PROGRESS && game.status != GameStatus.COMPLETED) {
       this.context.router.push('/lobby');
       return false;
     }
@@ -103,7 +103,7 @@ export default class GameLayout extends Component {
     };
 
     const getPlayerBar = () => {
-      if (game.status != 'COMPLETE') {
+      if (game.status != GameStatus.COMPLETED) {
         return (
           <div className={'player-bar ' + thisPerson.player.team}>
             <div className="username">{thisPerson.user.username}</div>
@@ -116,7 +116,7 @@ export default class GameLayout extends Component {
 
     const getVictoryBar = () => {
       console.log(game);
-      if (game.status == 'COMPLETE' && game.victor) {
+      if (game.status == GameStatus.COMPLETED && game.victor) {
         return (
           <div className={'victory-bar ' + game.victor}><span className="team">{game.victor}</span> team wins!</div>
         );
@@ -124,7 +124,7 @@ export default class GameLayout extends Component {
     };
 
     const getSidebar = () => {
-      if (game.status != 'COMPLETE') {
+      if (game.status != GameStatus.COMPLETED) {
         return (
           <Sidebar person={thisPerson} gameplay={gameplay} actions={actions} />
         );
