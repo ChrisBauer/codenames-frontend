@@ -66,9 +66,12 @@ export default class StagingLayout extends Component {
     if (!this.validateProps(this.props)) {
       return null;
     }
+
     const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
 
     const game = games[currentGameId];
+
+    document.title = 'Codenames | Staging: ' + game.name;
     const teams = this.getTeams(users, game.players);
 
     const logout = () => {

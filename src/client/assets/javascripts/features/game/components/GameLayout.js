@@ -95,6 +95,8 @@ export default class GameLayout extends Component {
     const gameplay = game.play;
     const thisPerson = this.getPerson(users, game.players, currentUserId);
 
+    document.title = 'Codenames | Game: ' + game.name;
+
     const cardAction = (card) => {
       const action = this.validateAction(thisPerson, gameplay, ACTION_TYPES.GUESS);
       if (action) {

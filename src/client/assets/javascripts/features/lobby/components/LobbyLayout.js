@@ -45,6 +45,8 @@ export default class LobbyLayout extends Component {
 
     const { users: { users, currentUserId }, games: {games}, actions } = this.props;
 
+    document.title = 'Codenames | Lobby: ' + users[currentUserId].username;
+
     const pendingGames = Object.keys(games).map(id => games[id]).filter(game => game.status == GameStatus.PENDING);
 
     const newGameHandler = () => {

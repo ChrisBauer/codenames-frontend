@@ -32,6 +32,7 @@ export default class LoginLayout extends Component {
     if (!this.validateProps(this.props)) {
       return null;
     }
+    document.title = 'Codenames';
     const { actions } = this.props;
     const loginHandler = () => {
       if (this.loginInput.value) {
