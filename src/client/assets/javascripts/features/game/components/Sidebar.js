@@ -42,7 +42,7 @@ export default class Sidebar extends Component {
     const lastClue = gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE ? undefined : (
         <div>
           <p>Last Clue: {gameplay.clue}</p>
-          <p>Guesses remaining: {gameplay.guessesRemaining}</p>
+          <p>Guesses remaining: {(gameplay.guessesRemaining < 0 ? 'Unlimited!' : gameplay.guessesRemaining)}</p>
         </div>
       );
 

@@ -3,42 +3,43 @@
 .staging {
   font-size: 0;
   margin-top: 20px;
-}
-.red, .blue {
-  display: inline-block;
-  vertical-align: top;
-  width: 46%;
-  margin: 0 1%;
+  .red, .blue {
+    display: inline-block;
+    vertical-align: top;
+    width: 46%;
+    margin: 0 1%;
 
-  h1 {
-    text-align: center;
-  }
-
-  .player {
-    text-align: center;
-    padding: 8px 0;
-    margin: 20px 0;
-
-    .role {
-      text-transform: capitalize;
+    h1 {
+      text-align: center;
     }
 
-    &.this-player {
-      border: 1px solid #eee;
-    }
+    .player {
+      text-align: center;
+      padding: 8px 0;
+      margin: 20px 0;
 
-    .is-ready {
-      text-align: left;
-      height:0;
-      padding-left: 4px;
-      font-size: 32px;
-      &:after {
-        content: '✓';
-        color: darkgreen;
+      .role {
+        text-transform: capitalize;
+      }
+
+      &.this-player {
+        border: 1px solid #eee;
+      }
+
+      .is-ready {
+        text-align: left;
+        height:0;
+        padding-left: 4px;
+        font-size: 32px;
+        &:after {
+          content: '✓';
+          color: darkgreen;
+        }
       }
     }
   }
 }
+
 
 ul.options {
   margin: 0;

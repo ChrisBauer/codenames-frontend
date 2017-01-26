@@ -8,18 +8,13 @@ export const CardState = {
   SUGGESTED: "suggested"
 };
 
-export type CardColor = {
+export const CardColor = {
   RED: 'red',
   BLUE: 'blue',
   BROWN: 'brown',
   BLACK: 'black'
-}
+};
 
-export type Card = {
-  word: string,
-  state: CardState,
-  color: CardColor
-}
 
 export const wordList = [
   'AFRICA',
