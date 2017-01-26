@@ -16,7 +16,7 @@ export type GameInfo = {
   status: GameStatus
 };
 
-export const teams = {
+export const Teams = {
   RED: 'red',
   BLUE: 'blue'
 };
