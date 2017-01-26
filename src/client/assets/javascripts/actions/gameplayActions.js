@@ -105,7 +105,8 @@ horizonRedux.takeLatest(
         nextMove: null,
         nextMoveType: null,
         board: gameplay.board,
-        moves: [...gameplay.moves, move]
+        moves: [...gameplay.moves, move],
+        victor: getOtherTeam(player.team)
       };
       return horizon('games').update({id: gameId, status: 'COMPLETE', play: newGameplay});
     }
@@ -130,7 +131,9 @@ horizonRedux.takeLatest(
       return horizon('games').update({id: gameId, play: newGameplay});
     }
   },
-  (result, action, dispatch) => {},
+  (result, action, dispatch) => {
+    // TODO: check victory condition!
+  },
   err => console.err('error making guess', err)
 );
 

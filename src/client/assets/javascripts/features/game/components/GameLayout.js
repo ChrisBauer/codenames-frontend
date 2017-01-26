@@ -41,7 +41,7 @@ export default class GameLayout extends Component {
     }
 
     const game = games[currentGameId];
-    if (game.status != 'IN_PROGRESS' && game.status != 'COMPLETED') {
+    if (game.status != 'IN_PROGRESS' && game.status != 'COMPLETE') {
       this.context.router.push('/lobby');
       return false;
     }
