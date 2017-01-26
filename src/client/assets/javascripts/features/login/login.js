@@ -4,7 +4,6 @@
 // @flow
 
 import { createStructuredSelector } from 'reselect';
-import { User } from 'models/user';
 
 export const selector = createStructuredSelector({
   users: state => state.users.users,

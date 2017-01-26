@@ -3,7 +3,6 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import {Player} from 'models/user';
 import {ACTION_TYPES} from 'actions/gameplayActions';
 
 import './Game.scss';

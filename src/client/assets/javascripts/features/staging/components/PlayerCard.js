@@ -2,8 +2,6 @@
  * Created by chris on 1/25/17.
  */
 import React, { Component, PropTypes } from 'react';
-import {Player} from 'models/user';
-
 
 export default class PlayerCard extends Component {
   static propTypes = {

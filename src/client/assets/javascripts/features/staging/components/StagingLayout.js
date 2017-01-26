@@ -4,7 +4,6 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import {Player} from 'models/user';
 import PlayerCard from './PlayerCard';
 
 import './Staging.scss';

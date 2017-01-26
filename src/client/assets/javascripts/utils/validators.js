@@ -2,7 +2,8 @@
  * Created by chris on 1/8/17.
  */
 
-import {CardColor} from 'models/card';
+import {CardColor, CardState} from 'models/card';
+import {Roles} from 'models/game';
 
 export const validateUser = (users, currentUserId) => {
   return currentUserId != null && users[currentUserId];
@@ -15,8 +16,8 @@ export const validateGameForStaging = (games, currentGameId, currentUserId) => {
 };
 
 export const checkForVictory = (board) => {
-  const redVictory = board.filter(card => card.color == CardColor.RED).every(card => card.status == 'GUESSED');
-  const blueVictory = board.filter(card => card.color == CardColor.BLUE).every(card => card.status == 'GUESSED');
+  const redVictory = board.filter(card => card.color == CardColor.RED).every(card => card.status == CardState.GUESSED);
+  const blueVictory = board.filter(card => card.color == CardColor.BLUE).every(card => card.status == CardState.GUESSED);
 
   if (redVictory && blueVictory) {
     throw new Error('Both teams match victory condition - how can this be?!');
@@ -60,10 +61,10 @@ export const gameCanStart = (players) => {
     return false;
   }
   // Need one and only one GIVER per team.
-  if (Object.keys(teams.red).filter(id => teams.red[id].role == 'GIVER').length != 1) {
+  if (Object.keys(teams.red).filter(id => teams.red[id].role == Roles.GIVER).length != 1) {
     return false;
   }
-  if (Object.keys(teams.blue).filter(id => teams.blue[id].role == 'GIVER').length != 1) {
+  if (Object.keys(teams.blue).filter(id => teams.blue[id].role == Roles.GIVER).length != 1) {
     return false;
   }
 

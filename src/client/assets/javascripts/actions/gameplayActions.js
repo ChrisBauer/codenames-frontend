@@ -7,8 +7,8 @@ import {Observable} from 'rxjs';
 
 import {getCurrentUserId, getUser, getCurrentGameId, getGame, getGamePlayerFromUser} from 'utils/stateTraversal';
 import {gameCanStart, checkForVictory} from 'utils/validators';
-import {cardColor} from 'models/card';
-import {Teams} from 'models/game';
+import {CardColor, CardState} from 'models/card';
+import {Teams, Roles} from 'models/game';
 
 export const INIT_GAMEPLAY = 'codenames/actions/gameplay/initGameplay';
 export const CHECK_VICTORY = 'codenames/actions/gameplay/checkVictory';
@@ -59,7 +59,7 @@ horizonRedux.takeLatest(
       return Observable.empty();
     }
     const gameplay = game.play;
-    if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != 'GUESSER') {
+    if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != Roles.GUESSER) {
       return Observable.empty();
     }
     const move = {userId, action: ACTION_TYPES.PASS};
@@ -88,19 +88,19 @@ horizonRedux.takeLatest(
 
     const gameplay = game.play;
     // Make sure it's a valid time to guess
-    if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != 'GUESSER') {
+    if (gameplay.nextMoveType != ACTION_TYPES.GUESS || player.team != gameplay.nextMove || player.role != Roles.GUESSER) {
       return Observable.empty();
     }
     // If it's already been guessed, ignore it.
-    if (action.card.status == 'GUESSED') {
+    if (action.card.status == CardState.GUESSED) {
       return Observable.empty();
     }
 
-    action.card.status = 'GUESSED';
+    action.card.status = CardState.GUESSED;
 
     const move = {userId, action: ACTION_TYPES.GUESS, card: action.card};
 
-    if (action.card.color == cardColor.BLACK) {
+    if (action.card.color == CardColor.BLACK) {
       // Assassin card
       const newGameplay = {
         guessesRemaining: 0,
@@ -153,7 +153,7 @@ horizonRedux.takeLatest(
 
     const gameplay = game.play;
 
-    if (gameplay.nextMoveType != ACTION_TYPES.GIVE_CLUE || player.team != gameplay.nextMove || player.role != 'GIVER') {
+    if (gameplay.nextMoveType != ACTION_TYPES.GIVE_CLUE || player.team != gameplay.nextMove || player.role != Roles.GIVER) {
       return Observable.empty();
     }
 

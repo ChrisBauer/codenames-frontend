@@ -4,7 +4,8 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import {Player} from 'models/user';
+import {Roles} from 'models/game';
+import {CardState} from 'models/card';
 import {ACTION_TYPES} from 'actions/gameplayActions';
 import Sidebar from './sidebar';
 
@@ -56,11 +57,11 @@ export default class GameLayout extends Component {
 
   validateAction (thisPerson, gameplay, actionType) {
     if (gameplay.nextMove == thisPerson.player.team) {
-      if (actionType == ACTION_TYPES.GIVE_CLUE && gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE && thisPerson.player.role == 'GIVER') {
+      if (actionType == ACTION_TYPES.GIVE_CLUE && gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE && thisPerson.player.role == Roles.GIVER) {
         return this.props.actions.giveClue;
       }
       if ((actionType == ACTION_TYPES.GUESS || actionType == ACTION_TYPES.PASS) &&
-          gameplay.nextMoveType == ACTION_TYPES.GUESS && thisPerson.player.role == 'GUESSER') {
+          gameplay.nextMoveType == ACTION_TYPES.GUESS && thisPerson.player.role == Roles.GUESSER) {
         if (actionType == ACTION_TYPES.GUESS) {
           return this.props.actions.guess;
         }
@@ -145,10 +146,10 @@ export default class GameLayout extends Component {
             <div className="board">
               {gameplay.board.map(card => {
                 let classes = 'card';
-                if (card.status == 'GUESSED' || thisPerson.player.role == 'GIVER') {
+                if (card.status == CardState.GUESSED || thisPerson.player.role == Roles.GIVER) {
                   classes += ` ${card.color}`;
                 }
-                if (card.status == 'GUESSED') {
+                if (card.status == CardState.GUESSED) {
                   classes += ' guessed';
                 }
                 return (

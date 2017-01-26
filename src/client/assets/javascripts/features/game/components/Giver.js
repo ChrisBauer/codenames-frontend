@@ -3,7 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import {Player} from 'models/user';
+import {Roles} from 'models/game';
 import {ACTION_TYPES} from 'actions/gameplayActions';
 
 import './Game.scss';
@@ -28,7 +28,7 @@ export default class Giver extends Component {
   getCluegiverContent(person, gameplay) {
     if (gameplay.nextMove == person.player.team &&
         gameplay.nextMoveType == ACTION_TYPES.GIVE_CLUE &&
-        person.player.role == 'GIVER') {
+        person.player.role == Roles.GIVER) {
       return (
         <div className="clue-form">
           <p>You're up!</p>

@@ -21,6 +21,11 @@ export const Teams = {
   BLUE: 'blue'
 };
 
+export const Roles = {
+  GIVER: 'Giver',
+  GUESSER: 'Guesser'
+};
+
 export type Board = {
   board: [Card]   // cards laid out as a list:
                   // 0 1 2 3 4
