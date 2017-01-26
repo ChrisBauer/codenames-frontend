@@ -1,8 +1,22 @@
 body {
   background: #f1f1f1;
-  padding-top: 30px;
 }
 
 #app {
   width: 100%;
+}
+
+.top-bar {
+  height: 60px;
+  text-align: right;
+  line-height: 60px;
+  padding-right: 10px;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 1px 5px #ccc;
+
+  a, span, div {
+    display: inline-block;
+    margin: 0 10px;
+    text-align:center;
+  }
 }

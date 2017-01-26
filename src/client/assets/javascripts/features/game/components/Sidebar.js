@@ -46,9 +46,16 @@ export default class Sidebar extends Component {
         </div>
       );
 
+    const getMoveText = moveType => {
+      console.log(moveType);
+      return moveType == ACTION_TYPES.GUESS ? ' guess' : ' give a clue';
+    };
+
     return (
       <div className="sidebar">
-        <p><span className="move">{gameplay.nextMove}</span> team: <span className="type">{gameplay.nextMoveType}</span></p>
+        <p className={gameplay.nextMove}>It's
+          <span className="team"> {gameplay.nextMove.toLowerCase()}</span> Team's turn to
+          <span className="type">{getMoveText(gameplay.nextMoveType)}</span></p>
         {lastClue}
         {gameActions}
       </div>

@@ -31,8 +31,9 @@ export default class Giver extends Component {
         person.player.role == 'GIVER') {
       return (
         <div className="clue-form">
+          <p>You're up!</p>
           <input ref={input => {this.clue = input; }} placeholder="Clue" />
-          <input ref={input => {this.count = input; }} type="number" defaultValue="1" />
+          <input ref={input => {this.count = input; }} placeholder="Number of Guesses" type="number" defaultValue="1" />
           <button onClick={() => this.giveClue(person)}>Give Clue</button>
         </div>
       );

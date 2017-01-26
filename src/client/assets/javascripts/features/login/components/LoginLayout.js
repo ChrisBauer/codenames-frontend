@@ -39,18 +39,15 @@ export default class LoginLayout extends Component {
       }
     };
 
-    const generateTemplate = () => {
-      return (
+    return (
+      <div className="login">
+        <div className="splash">
+          Welcome to Codenames!
+        </div>
         <div>
           <input ref={input => {this.loginInput = input; }} placeholder="Username"></input>
           <button onClick={loginHandler}>Login</button>
         </div>
-      );
-    };
-
-    return (
-      <div className="login">
-        {generateTemplate()}
       </div>
     );
   }

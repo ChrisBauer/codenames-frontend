@@ -101,28 +101,63 @@ export default class GameLayout extends Component {
       }
     };
 
+    const getPlayerBar = () => {
+      if (game.status != 'COMPLETE') {
+        return (
+          <div className={'player-bar ' + thisPerson.player.team}>
+            <div className="username">{thisPerson.user.username}</div>
+            &ndash;
+            <div className="role">{thisPerson.player.role.toLowerCase()}</div>
+          </div>
+        );
+      }
+    };
+
+    const getVictoryBar = () => {
+      console.log(game);
+      if (game.status == 'COMPLETE' && game.victor) {
+        return (
+          <div className={'victory-bar ' + game.victor}><span className="team">{game.victor}</span> team wins!</div>
+        );
+      }
+    };
+
+    const getSidebar = () => {
+      if (game.status != 'COMPLETE') {
+        return (
+          <Sidebar person={thisPerson} gameplay={gameplay} actions={actions} />
+        );
+      }
+    };
+
     // TODO: break giver/guesser into separate components?
     // TODO: Or: GamePage, GameBoard, GiverSidebar, GuesserSidebar
     return (
       <div className="game-page">
-        <a onClick={() => this.logout()}>Logout</a>
-        <a onClick={() => this.leaveGame()}>Leave Game</a>
+        <div className="top-bar">
+          <a onClick={() => this.leaveGame()}>Leave Game</a>
+          <a onClick={() => this.logout()}>Logout</a>
+        </div>
+        {getPlayerBar()}
+        {getVictoryBar()}
         <div className="game">
-          <div className="board">
-            {gameplay.board.map(card => {
-              let classes = 'card';
-              if (card.status == 'GUESSED' || thisPerson.player.role == 'GIVER') {
-                classes += ` ${card.color}`;
-              }
-              if (card.status == 'GUESSED') {
-                classes += ' guessed';
-              }
-              return (
-                <div key={card.key} className={classes} onClick={() => cardAction(card)}>{card.word}</div>
-              );
-            })}
+          <div className="board-wrapper">
+            <div className="board">
+              {gameplay.board.map(card => {
+                let classes = 'card';
+                if (card.status == 'GUESSED' || thisPerson.player.role == 'GIVER') {
+                  classes += ` ${card.color}`;
+                }
+                if (card.status == 'GUESSED') {
+                  classes += ' guessed';
+                }
+                return (
+                  <div key={card.key} className={classes} onClick={() => cardAction(card)}>{card.word}</div>
+                );
+              })}
+            </div>
           </div>
-          <Sidebar person={thisPerson} gameplay={gameplay} actions={actions} />
+          {getSidebar()}
         </div>
       </div>
     );

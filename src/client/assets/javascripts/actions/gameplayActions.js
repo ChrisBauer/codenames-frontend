@@ -6,9 +6,10 @@ import {wordList, CardState, CardColor} from 'models/card';
 import {Observable} from 'rxjs';
 
 import {getCurrentUserId, getUser, getCurrentGameId, getGame, getGamePlayerFromUser} from 'utils/stateTraversal';
-import {gameCanStart} from 'utils/validators';
+import {gameCanStart, checkForVictory} from 'utils/validators';
 
 export const INIT_GAMEPLAY = 'codenames/actions/gameplay/initGameplay';
+export const CHECK_VICTORY = 'codenames/actions/gameplay/checkVictory';
 export const GUESS = 'codenames/actions/gameplay/guess';
 export const PASS = 'codenames/actions/gameplay/pass';
 export const GIVE_CLUE = 'codenames/actions/gameplay/giveClue';
@@ -106,9 +107,8 @@ horizonRedux.takeLatest(
         nextMoveType: null,
         board: gameplay.board,
         moves: [...gameplay.moves, move],
-        victor: getOtherTeam(player.team)
       };
-      return horizon('games').update({id: gameId, status: 'COMPLETE', play: newGameplay});
+      return horizon('games').update({id: gameId, status: 'COMPLETE', victor: getOtherTeam(player.team), play: newGameplay});
     }
     else if (action.card.color == player.team && gameplay.guessesRemaining != 1) {
       const newGameplay = {
@@ -132,7 +132,7 @@ horizonRedux.takeLatest(
     }
   },
   (result, action, dispatch) => {
-    // TODO: check victory condition!
+    dispatch(checkVictory(result));
   },
   err => console.err('error making guess', err)
 );
@@ -171,6 +171,32 @@ horizonRedux.takeLatest(
   },
   (result, action, dispatch) => {},
   err => console.err('error giving clue', err)
+);
+
+horizonRedux.takeLatest(
+  CHECK_VICTORY,
+  (horizon, action, getState) => {
+    const state = getState();
+    const gameId = getCurrentGameId(state);
+    const userId = getCurrentUserId(state);
+    const game = getGame(state, gameId);
+    if (!gameId || !userId || !game) {
+      return Observable.empty();
+    }
+    const victor = checkForVictory(game.play.board);
+    if (!victor) {
+      return Observable.empty();
+    }
+    const play = {
+      nextMove: null,
+      nextMoveType: null,
+      clue: '',
+      guessesRemaining: 0
+    };
+    return horizon('games').update({id: gameId, status: 'COMPLETE', play, victor});
+  },
+  (result, action, dispatch) => {},
+  err => console.err('error checking victory')
 );
 
 const getOtherTeam = team => team == 'RED' ? 'BLUE' : 'RED';
@@ -233,6 +259,11 @@ const getInitialState = () => {
 
 export const initGameplay = (gameId) => ({
   type: INIT_GAMEPLAY,
+  gameId
+});
+
+export const checkVictory = (gameId) => ({
+  type: CHECK_VICTORY,
   gameId
 });
 

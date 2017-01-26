@@ -12,6 +12,21 @@ export const validateGameForStaging = (games, currentGameId, currentUserId) => {
       games[currentGameId].players[currentUserId]);
 };
 
+export const checkForVictory = (board) => {
+  const redVictory = board.filter(card => card.color == 'RED').every(card => card.status == 'GUESSED');
+  const blueVictory = board.filter(card => card.color == 'BLUE').every(card => card.status == 'GUESSED');
+
+  if (redVictory && blueVictory) {
+    throw new Error('Both teams match victory condition - how can this be?!');
+  }
+  if (!redVictory && !blueVictory) {
+    return null;
+  }
+
+  // At this point we know that one is true and one is false.
+  return redVictory ? 'RED' : 'BLUE';
+};
+
 const getTeams = (players) => {
   return Object.keys(players).reduce((teams, id) => {
     if (!players[id].ready) {

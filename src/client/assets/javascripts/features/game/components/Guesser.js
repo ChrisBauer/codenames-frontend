@@ -23,6 +23,7 @@ export default class Guesser extends Component {
     if (gameplay.nextMove == person.player.team && gameplay.nextMoveType == ACTION_TYPES.GUESS) {
       return (
         <div className="clue-form">
+          <p>You're up!</p>
           <button onClick={() => this.pass(person)}>Pass</button>
         </div>
       );

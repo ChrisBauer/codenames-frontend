@@ -5,6 +5,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import {Player} from 'models/user';
+import PlayerCard from './PlayerCard';
 
 import './Staging.scss';
 
@@ -68,7 +69,6 @@ export default class StagingLayout extends Component {
     const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
 
     const game = games[currentGameId];
-    const thisPerson = this.getPerson(users, game.players, currentUserId);
     const teams = this.getTeams(users, game.players);
 
     const logout = () => {
@@ -81,71 +81,31 @@ export default class StagingLayout extends Component {
       this.context.router.push('/lobby');
     };
 
-    const changeTeam = () => {
-      actions.changeTeam(currentUserId);
-    };
-
-    const changeRole = () => {
-      actions.changeRole(currentUserId);
-    };
-
-    const setReady = () => {
-      actions.setReady(currentUserId);
-    };
-
     // TODO: make person component, switcher component to avoid duplication
 
     return (
-      <div className="staging">
-        <a onClick={logout}>Logout</a>
-        <a onClick={leaveStaging}>Back to Lobby</a>
-        <div className="red">
-          <h1>Red Team</h1>
-          <hr />
-          {Object.keys(teams.RED).map(userId => {
-            const person = teams.RED[userId];
-            if (person.id == thisPerson.id) {
-              return (
-                <div key={userId} className="player">
-                  <div className={person.player.ready ? 'is-ready': ''}/>
-                  <h2 className={person.player.role}>{person.user.username}</h2>
-                  <button className="change-team" onClick={changeTeam}>T</button>
-                  <button className="change-role" onClick={changeRole}>R</button>
-                  <button className="set-ready" onClick={setReady}>✓</button>
-                </div>
-              )
-            }
-            return (
-              <div key={userId} className="player">
-                <div className={person.player.ready ? 'is-ready': ''}/>
-                <h2 className={person.player.role}>{person.user.username}</h2>
-              </div>
-            )
-          })}
+      <div>
+        <div className="top-bar">
+          <a onClick={leaveStaging}>Back to Lobby</a>
+          <a onClick={logout}>Logout</a>
         </div>
-        <div className="blue">
-          <h1>Blue Team</h1>
-          <hr />
-          {Object.keys(teams.BLUE).map(userId => {
-            const person = teams.BLUE[userId];
-            if (person.id == thisPerson.id) {
-              return (
-                <div key={userId} className="player">
-                  <div className={person.player.ready ? 'is-ready': ''}/>
-                  <h2 className={person.player.role}>{person.user.username}</h2>
-                  <button className="change-team" onClick={changeTeam}>T</button>
-                  <button className="change-role" onClick={changeRole}>R</button>
-                  <button className="set-ready" onClick={setReady}>✓</button>
-                </div>
-              )
-            }
-            return (
-              <div key={userId} className="player">
-                <div className={person.player.ready ? 'is-ready': ''}/>
-                <h2 className={person.player.role}>{person.user.username}</h2>
-              </div>
-            )
-          })}
+        <div className="staging">
+          <div className="red">
+            <h1>Red Team</h1>
+            <hr />
+            {Object.keys(teams.RED).map(userId => {
+              const person = teams.RED[userId];
+              return <PlayerCard key={userId} actions={actions} person={person} currentUserId={currentUserId}/>;
+            })}
+          </div>
+          <div className="blue">
+            <h1>Blue Team</h1>
+            <hr />
+            {Object.keys(teams.BLUE).map(userId => {
+              const person = teams.BLUE[userId];
+              return <PlayerCard key={userId} actions={actions} person={person} currentUserId={currentUserId}/>;
+            })}
+          </div>
         </div>
       </div>
     );

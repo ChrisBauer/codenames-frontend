@@ -60,24 +60,28 @@ export default class LobbyLayout extends Component {
     };
 
     return (
-      <div className="lobby">
-        <a onClick={leaveLobby}>Back to Login</a>
-        <div className="users">
-          <h1>Users</h1>
-          <hr />
-          {Object.keys(users).map(id => (
-            <div key={id} className="user">{users[id].username}</div>
-          ))}
+      <div>
+        <div className="top-bar">
+          <a onClick={leaveLobby}>Logout</a>
         </div>
-        <div className="games">
-          <h1>Games</h1>
-          <hr />
-          <button onClick={() => newGameHandler(currentUserId, 'Testing')}>Create Game</button>
-          <ul className="gameList">
-            {pendingGames.map(game => (
-              <li key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</li>
+        <div className="lobby">
+          <div className="users">
+            <h1>Users</h1>
+            <hr />
+            {Object.keys(users).map(id => (
+              <div key={id} className="user">{users[id].username}</div>
             ))}
-          </ul>
+          </div>
+          <div className="games">
+            <h1>Games</h1>
+            <hr />
+            <button onClick={() => newGameHandler(currentUserId, 'Testing')}>Create Game</button>
+            <ul className="gameList">
+              {pendingGames.map(game => (
+                <li key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     );

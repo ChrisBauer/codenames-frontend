@@ -1,24 +1,54 @@
 
 
 .staging {
-  display: flex;
+  font-size: 0;
+  margin-top: 20px;
 }
-
 .red, .blue {
-  flex: 1 0 auto;
-  padding: 20px;
+  display: inline-block;
+  vertical-align: top;
+  width: 46%;
+  margin: 0 1%;
 
   h1 {
     text-align: center;
   }
 
   .player {
-    display: flex;
+    text-align: center;
+    padding: 8px 0;
+    margin: 20px 0;
 
-    .is-ready:after {
-      content: '✓';
-      color: darkgreen;
+    .role {
+      text-transform: capitalize;
     }
+
+    &.this-player {
+      border: 1px solid #eee;
+    }
+
+    .is-ready {
+      text-align: left;
+      height:0;
+      padding-left: 4px;
+      font-size: 32px;
+      &:after {
+        content: '✓';
+        color: darkgreen;
+      }
+    }
+  }
+}
+
+ul.options {
+  margin: 0;
+  padding: 0;
+  font-size: initial;
+
+  li {
+    list-style-type: none;
+    color: #014c8c;
+    cursor: pointer;
   }
 }
 
@@ -31,10 +61,6 @@
   h2 {
     color: #014c8c;
   }
-}
-
-.GIVER {
-  text-decoration: underline;
 }
 
 a {
