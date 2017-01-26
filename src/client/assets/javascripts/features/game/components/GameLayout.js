@@ -7,7 +7,7 @@ import React, { Component, PropTypes } from 'react';
 import {Roles, GameStatus} from 'models/game';
 import {CardState} from 'models/card';
 import {ACTION_TYPES} from 'actions/gameplayActions';
-import Sidebar from './sidebar';
+import Sidebar from './Sidebar';
 
 import './Game.scss';
 
