@@ -29,39 +29,29 @@ export default class GameLayout extends Component {
     };
   }
 
-  getTeams (users, players) {
-    return Object.keys(players).reduce((teams, userId) => {
-      const nextPerson = this.getPerson(users, players, userId);
-      const team = nextPerson.player.team;
-      teams[team][userId] = nextPerson;
-      return teams;
-    }, {RED: {}, BLUE: {}});
-  }
-
-  verifyState(users, games, currentUserId, currentGameId) {
+  validateProps(props) {
+    const { users: { currentUserId, users}, games: { games, currentGameId } } = props;
     if (currentUserId == null) {
       this.context.router.push('/');
+      return false;
     }
     if (currentGameId == null) {
       this.context.router.push('/lobby');
-    }
-
-    const thisPerson = this.getPerson(users, games[currentGameId].players, currentUserId);
-    if (!thisPerson) {
-      this.context.router.push('/lobby');
+      return false;
     }
 
     const game = games[currentGameId];
-
-    if (game.status == 'PENDING') {
-      this.context.router.push('/staging');
+    if (game.status != 'IN_PROGRESS' && game.status != 'COMPLETED') {
+      this.context.router.push('/lobby');
+      return false;
     }
 
-    const gameplay = game.play;
+    const thisPerson = this.getPerson(users, game.players, currentUserId);
+    if (!thisPerson) {
+      this.context.router.push('/lobby');
+      return false;
+    }
 
-    const teams = this.getTeams(users, game.players);
-
-    return {game, thisPerson, teams, gameplay};
   }
 
   validateAction (thisPerson, gameplay, actionType) {
@@ -94,9 +84,15 @@ export default class GameLayout extends Component {
 
   render() {
     console.log(this.props);
-    const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
 
-    const { thisPerson, gameplay } = this.verifyState(users, games, currentUserId, currentGameId);
+    if (!this.validateProps(this.props)) {
+      return null;
+    }
+
+    const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
+    const game = games[currentGameId];
+    const gameplay = game.play;
+    const thisPerson = this.getPerson(users, game.players, currentUserId);
 
     const cardAction = (card) => {
       const action = this.validateAction(thisPerson, gameplay, ACTION_TYPES.GUESS);

@@ -18,15 +18,21 @@ export default class LoginLayout extends Component {
     router: React.PropTypes.object.isRequired
   };
 
-  render() {
-    console.log(this.props);
-    console.log('in render function');
-    const { users, currentUserId, actions } = this.props;
+  validateProps(props) {
+    const { users, currentUserId } = this.props;
 
     if (currentUserId && validateUser(users, currentUserId)) {
       this.context.router.push('/lobby');
+      return false;
     }
+    return true;
+  }
 
+  render() {
+    if (!this.validateProps(this.props)) {
+      return null;
+    }
+    const { actions } = this.props;
     const loginHandler = () => {
       if (this.loginInput.value) {
         actions.loginUser(this.loginInput.value);

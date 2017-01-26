@@ -22,17 +22,27 @@ export default class LobbyLayout extends Component {
     this.props.actions.watchGames();
   }
 
-  render() {
-    console.log(this.props);
-    const { users: { users, currentUserId }, games: {games, currentGameId}, actions } = this.props;
+  validateProps(props) {
+    const { users: { users, currentUserId }, games: {games, currentGameId} } = props;
 
     if (!validateUser(users, currentUserId)) {
       this.context.router.push('/');
+      return false;
     }
 
     if (validateGame(games, currentGameId, currentUserId)) {
       this.context.router.push('/staging');
+      return false;
     }
+    return true;
+  }
+
+  render() {
+    if (!this.validateProps(this.props)) {
+      return null;
+    }
+
+    const { users: { users, currentUserId }, games: {games}, actions } = this.props;
 
     const pendingGames = Object.keys(games).map(id => games[id]).filter(game => game.status == 'PENDING');
 
@@ -48,9 +58,6 @@ export default class LobbyLayout extends Component {
     const goToGame = (gameId) => {
       actions.selectGame(gameId);
     };
-
-    /*
-     </div>*/
 
     return (
       <div className="lobby">

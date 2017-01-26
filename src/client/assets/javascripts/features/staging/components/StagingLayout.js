@@ -35,27 +35,40 @@ export default class StagingLayout extends Component {
       return teams;
     }, {RED: {}, BLUE: {}});
   }
-  render() {
-    console.log(this.props);
-    const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
+
+  validateProps (props) {
+    const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = props;
     if (currentUserId == null) {
       this.context.router.push('/');
+      return false;
     }
     if (currentGameId == null) {
       this.context.router.push('/lobby');
+      return false;
     }
 
     const thisPerson = this.getPerson(users, games[currentGameId].players, currentUserId);
     if (!thisPerson) {
       this.context.router.push('/lobby');
+      return false;
     }
 
     const game = games[currentGameId];
-
     if (game.status == 'IN_PROGRESS' && game.players[thisPerson.id]) {
       this.context.router.push('/game');
+      return false;
     }
+    return true;
+  }
 
+  render() {
+    if (!this.validateProps(this.props)) {
+      return null;
+    }
+    const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = this.props;
+
+    const game = games[currentGameId];
+    const thisPerson = this.getPerson(users, game.players, currentUserId);
     const teams = this.getTeams(users, game.players);
 
     const logout = () => {
