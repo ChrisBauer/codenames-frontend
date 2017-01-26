@@ -47,8 +47,10 @@ export default class LobbyLayout extends Component {
 
     const pendingGames = Object.keys(games).map(id => games[id]).filter(game => game.status == GameStatus.PENDING);
 
-    const newGameHandler = (userId: number, name: string) => {
-      actions.createGame(userId, name);
+    const newGameHandler = () => {
+      if (this.gameNameInput.value) {
+        actions.createGame(currentUserId, this.gameNameInput.value);
+      }
     };
 
     const leaveLobby = () => {
@@ -76,7 +78,10 @@ export default class LobbyLayout extends Component {
           <div className="games">
             <h1>Games</h1>
             <hr />
-            <button onClick={() => newGameHandler(currentUserId, 'Testing')}>Create Game</button>
+            <div className="create-game-form">
+              <input ref={input => {this.gameNameInput = input; }} placeholder="New Game Name" />
+              <button onClick={() => newGameHandler()}>Create Game</button>
+            </div>
             <ul className="gameList">
               {pendingGames.map(game => (
                 <li key={game.id} className="game" onClick={() => goToGame(game.id)}>{game.name}</li>
