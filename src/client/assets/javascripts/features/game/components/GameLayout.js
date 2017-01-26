@@ -51,7 +51,7 @@ export default class GameLayout extends Component {
       this.context.router.push('/lobby');
       return false;
     }
-
+    return true;
   }
 
   validateAction (thisPerson, gameplay, actionType) {
@@ -105,8 +105,8 @@ export default class GameLayout extends Component {
     // TODO: Or: GamePage, GameBoard, GiverSidebar, GuesserSidebar
     return (
       <div className="game-page">
-        <a onClick={this.logout}>Logout</a>
-        <a onClick={this.leaveGame}>Leave Game</a>
+        <a onClick={() => this.logout()}>Logout</a>
+        <a onClick={() => this.leaveGame()}>Leave Game</a>
         <div className="game">
           <div className="board">
             {gameplay.board.map(card => {

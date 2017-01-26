@@ -64,6 +64,7 @@ horizonRedux.takeLatest(
     // If the leaving player means that the game can no longer exist, set the game to error state
     if (game.status == 'IN_PROGRESS' && !gameCanStart(newPlayers)) {
       game.status = 'ERROR';
+      game.players = {};
       return horizon('games').replace(game);
     }
     game.players = newPlayers;

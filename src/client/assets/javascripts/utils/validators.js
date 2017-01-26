@@ -6,8 +6,9 @@ export const validateUser = (users, currentUserId) => {
   return currentUserId != null && users[currentUserId];
 };
 
-export const validateGame = (games, currentGameId, currentUserId) => {
+export const validateGameForStaging = (games, currentGameId, currentUserId) => {
   return (currentGameId != null && currentUserId != null && games[currentGameId] &&
+      games[currentGameId].status == 'PENDING' &&
       games[currentGameId].players[currentUserId]);
 };
 

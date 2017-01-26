@@ -3,7 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import { validateUser, validateGame } from 'utils/validators';
+import { validateUser, validateGameForStaging } from 'utils/validators';
 
 import './Lobby.scss';
 
@@ -30,7 +30,7 @@ export default class LobbyLayout extends Component {
       return false;
     }
 
-    if (validateGame(games, currentGameId, currentUserId)) {
+    if (validateGameForStaging(games, currentGameId, currentUserId)) {
       this.context.router.push('/staging');
       return false;
     }
