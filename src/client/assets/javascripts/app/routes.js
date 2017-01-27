@@ -7,6 +7,7 @@ import LoginView from 'features/login/components/LoginView';
 import LobbyView from 'features/lobby/components/LobbyView';
 import StagingView from 'features/staging/components/StagingView';
 import GameView from 'features/game/components/GameView';
+import AdminView from 'features/admin/components/AdminView';
 
 export default (
   <Route path="/" component={App}>
@@ -15,6 +16,7 @@ export default (
     <Route path="lobby" component={LobbyView} />
     <Route path="staging" component={StagingView} />
     <Route path="game" component={GameView} />
+    <Route path="/admin" component={AdminView} />
     <Redirect from="*" to="404" />
   </Route>
 );

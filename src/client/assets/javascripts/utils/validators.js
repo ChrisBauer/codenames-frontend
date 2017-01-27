@@ -15,6 +15,10 @@ export const validateGameForStaging = (games, currentGameId, currentUserId) => {
       games[currentGameId].players[currentUserId]);
 };
 
+export const isAdminUser = (users, userId) => {
+  return users && userId && users[userId] && users[userId].username == 'nimda';
+};
+
 export const checkForVictory = (board) => {
   const redVictory = board.filter(card => card.color == CardColor.RED).every(card => card.status == CardState.GUESSED);
   const blueVictory = board.filter(card => card.color == CardColor.BLUE).every(card => card.status == CardState.GUESSED);

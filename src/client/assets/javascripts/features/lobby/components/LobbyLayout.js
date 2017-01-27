@@ -3,7 +3,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
-import { validateUser, validateGameForStaging } from 'utils/validators';
+import { validateUser, validateGameForStaging, isAdminUser } from 'utils/validators';
 import {GameStatus} from 'models/game';
 
 import './Lobby.scss';
@@ -73,8 +73,8 @@ export default class LobbyLayout extends Component {
           <div className="users">
             <h1>Users</h1>
             <hr />
-            {Object.keys(users).map(id => (
-              <div key={id} className="user">{users[id].username}</div>
+            {Object.keys(users).filter(id => !isAdminUser(users, id)).map(id => users[id]).map(user => (
+              <div key={user.id} className="user">{user.username}</div>
             ))}
           </div>
           <div className="games">

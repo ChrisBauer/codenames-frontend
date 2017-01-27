@@ -1,0 +1,40 @@
+
+
+.admin {
+  font-size: 0;
+  .users, .games {
+    display: inline-block;
+    vertical-align: top;
+    width: 46%;
+    margin: 0 1%;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .user {
+    cursor: pointer;
+  }
+
+  .create-game-form {
+    input, button {
+      margin: 0 10px;
+    }
+  }
+
+  .gameList {
+    margin: 20px 0;
+    padding: 0;
+    .game {
+      list-style-type: none;
+      font-size: initial;
+      cursor: pointer;
+    }
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+}
+

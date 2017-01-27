@@ -39,11 +39,11 @@ export default class StagingLayout extends Component {
 
   validateProps (props) {
     const { users: { currentUserId, users}, games: { games, currentGameId }, actions } = props;
-    if (currentUserId == null) {
+    if (currentUserId == null || !users[currentUserId]) {
       this.context.router.push('/');
       return false;
     }
-    if (currentGameId == null) {
+    if (currentGameId == null || !games[currentGameId]) {
       this.context.router.push('/lobby');
       return false;
     }

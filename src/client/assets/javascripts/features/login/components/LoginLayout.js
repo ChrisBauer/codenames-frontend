@@ -5,7 +5,7 @@
 import React, { Component, PropTypes } from 'react';
 
 import './Login.scss';
-import { validateUser } from 'utils/validators';
+import { validateUser, isAdminUser} from 'utils/validators';
 
 export default class LoginLayout extends Component {
   static propTypes = {
@@ -22,6 +22,10 @@ export default class LoginLayout extends Component {
     const { users, currentUserId } = this.props;
 
     if (currentUserId && validateUser(users, currentUserId)) {
+      if (isAdminUser(users, currentUserId)) {
+        this.context.router.push('/admin');
+        return false;
+      }
       this.context.router.push('/lobby');
       return false;
     }
