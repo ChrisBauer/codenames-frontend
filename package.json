@@ -33,6 +33,7 @@
     "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.production.js --progress",
     "postbuild": "npm run build:html",
     "build:serve": "http-server build/client -p 3003 --cors -o",
+    "hz": "nohup hz serve --secure no --permissions no --auto-create-collection no --auto-create-index no --start-rethinkdb yes --allow-unauthenticated yes --allow-anonymous yes --schema-file .hz/schema.toml --bind all &",
     "lint": "eslint config src/js/** --ext .js",
     "jscs": "jscs src/js/",
     "typecheck": "flow",
