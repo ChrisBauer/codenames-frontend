@@ -1,8 +1,6 @@
 # Codenames
 
-Horizon + Redux implementation of the popular guessing game.
-
-[Codenames](https://en.wikipedia.org/wiki/Codenames_(board_game))
+Horizon + Redux implementation of the popular guessing game ([Codenames](https://en.wikipedia.org/wiki/Codenames_(board_game)))
 
 
 ## Build and Run
